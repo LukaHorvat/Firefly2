@@ -1,1 +1,9 @@
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\BuildProject.exe.config
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\BuildProject.exe
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\BuildProject.pdb
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\Firefly2.dll
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\OpenTK.dll
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\Firefly2.pdb
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\obj\Debug\BuildProject.csprojResolveAssemblyReference.cache
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\obj\Debug\BuildProject.exe
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\obj\Debug\BuildProject.pdb

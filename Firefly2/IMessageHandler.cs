@@ -6,14 +6,8 @@ using System.Threading.Tasks;
 
 namespace Firefly2
 {
-	public abstract class Component
+	public interface IMessageTaker<Message>
 	{
-		public Entity Host;
-		public readonly string Name;
-
-		public Component()
-		{
-			Name = this.GetType().Name;
-		}
+		void TakeMessage(Message msg);
 	}
 }

@@ -44,10 +44,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Component.cs" />
+    <Compile Include="Components\Geometry.cs" />
+    <Compile Include="Components\RenderBuffer.cs" />
+    <Compile Include="Components\ShapeColor.cs" />
     <Compile Include="Components\TreeNode.cs" />
     <Compile Include="Entity.cs" />
+    <Compile Include="Geometry\Triangle.cs" />
+    <Compile Include="IMessageHandler.cs" />
+    <Compile Include="IMessageResponder.cs" />
+    <Compile Include="Messages\GeometryChanged.cs" />
+    <Compile Include="Messages\Message.cs" />
+    <Compile Include="Messages\ShapeColorChanged.cs" />
+    <Compile Include="Messages\UpdateMessage.cs" />
     <Compile Include="Stage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\BinaryTree.cs" />
+    <Compile Include="Utility\Debug.cs" />
+    <Compile Include="Utility\Geometry.cs" />
+    <Compile Include="Utility\PriorityQueue.cs" />
+    <Compile Include="Utility\Triangulation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

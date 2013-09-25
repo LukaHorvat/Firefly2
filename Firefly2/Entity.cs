@@ -11,24 +11,43 @@ namespace Firefly2
 	public class Entity
 	{
 		public ObservableCollection<Component> Components;
+		private Dictionary<string, Component> componentsByName;
 
 		public Entity()
 		{
 			Components = new ObservableCollection<Component>();
+			componentsByName = new Dictionary<string, Component>();
+
 			Components.CollectionChanged += delegate(object target, NotifyCollectionChangedEventArgs args)
 			{
-				
+				foreach (Component component in args.NewItems) componentsByName[component.Name] = component;
+				foreach (Component component in args.OldItems) componentsByName.Remove(component.Name);
 			};
 		}
 
-		public object SendMessage(object message)
+		public Component this[string name]
 		{
-			foreach (var component in Components)
+			get
 			{
-				var res = component.ProcessMessage(message);
-				if (res != null) return res;
+				Component comp;
+				if (componentsByName.TryGetValue(name, out comp)) return comp;
+				return null;
 			}
-			return null;
+			private set { }
+		}
+
+		public T GetComponent<T>() where T : Component 
+		{
+			return this[typeof(T).Name] as T;
+		}
+
+		public void SendMessage<T>(T message)
+		{
+			for (int i = 0; i < Components.Count; ++i)
+			{
+				var func = Components[i] as IMessageTaker<T>;
+				if (func != null) func.TakeMessage(message);
+			}
 		}
 	}
 }
