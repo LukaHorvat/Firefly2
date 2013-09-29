@@ -7,3 +7,4 @@ C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\De
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\obj\Debug\BuildProject.csprojResolveAssemblyReference.cache
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\obj\Debug\BuildProject.exe
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\obj\Debug\BuildProject.pdb
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\Poly2Tri.dll

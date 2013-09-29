@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Firefly2.Components
 {
-	public class TreeNode : Component
+	public class TreeNodeComponent : Component
 	{
 		public class QueryResults<Query, Answer, Comp> where Comp : Component
 		{
-			private ObservableCollection<TreeNode> children;
+			private ObservableCollection<TreeNodeComponent> children;
 			private Query query;
 			private Dictionary<int, Answer> results;
 
@@ -34,7 +34,7 @@ namespace Firefly2.Components
 				}
 			}
 
-			public QueryResults(ObservableCollection<TreeNode> children, Query query)
+			public QueryResults(ObservableCollection<TreeNodeComponent> children, Query query)
 			{
 				this.children = children;
 				this.query = query;
@@ -70,16 +70,16 @@ namespace Firefly2.Components
 			}
 		}
 
-		public ObservableCollection<TreeNode> Children;
-		public TreeNode Parent;
+		public ObservableCollection<TreeNodeComponent> Children;
+		public TreeNodeComponent Parent;
 
-		public TreeNode() : this(null) { }
+		public TreeNodeComponent() : this(null) { }
 
-		public TreeNode(TreeNode parent)
+		public TreeNodeComponent(TreeNodeComponent parent)
 			: base()
 		{
 			Parent = parent;
-			Children = new ObservableCollection<TreeNode>();
+			Children = new ObservableCollection<TreeNodeComponent>();
 		}
 
 		public QueryResults<Query, Answer, Comp> QueryChildren<Query, Answer, Comp>(Query query) where Comp : Component

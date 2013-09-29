@@ -15,11 +15,11 @@ namespace Firefly2
 	{
 		public GameWindow Window;
 
-		protected TreeNode TreeNode
+		protected TreeNodeComponent TreeNode
 		{
 			get
 			{
-				return GetComponent<TreeNode>();
+				return GetComponent<TreeNodeComponent>();
 			}
 		}
 
@@ -40,6 +40,7 @@ namespace Firefly2
 			Window.UpdateFrame += delegate(object target, FrameEventArgs args)
 			{
 				TreeNode.PropagateMessageDownwards(new UpdateMessage(args.Time));
+				TreeNode.PropagateMessageDownwards(new AfterUpdateMessage(args.Time));
 			};
 
 			Window.RenderFrame += delegate
@@ -51,7 +52,7 @@ namespace Firefly2
 				Window.SwapBuffers();
 			};
 
-			Components.Add(new TreeNode());
+			Components.Add(new TreeNodeComponent());
 
 			Window.Run();
 		}
