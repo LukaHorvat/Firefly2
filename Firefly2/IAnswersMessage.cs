@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Firefly2
 {
-	public interface IMessageTaker<Message>
+	public interface IAnswersMessage<Message, Response>
 	{
-		void TakeMessage(Message msg);
+		Response AnswerMessage(Message msg);
 	}
 }

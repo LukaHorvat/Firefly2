@@ -11,27 +11,37 @@ using System.Threading.Tasks;
 
 namespace Firefly2.Components
 {
-	public class RenderBufferComponent : Component, IMessageTaker<GeometryChanged>,
-													IMessageTaker<ShapeColorChanged>,
-													IMessageTaker<TexCoordsChanged>,
-													IMessageTaker<AfterUpdateMessage>
+	public class RenderBufferComponent : Component, ITakesMessage<GeometryChanged>,
+													ITakesMessage<ShapeColorChanged>,
+													ITakesMessage<TexCoordsChanged>,
+													ITakesMessage<NewTransformIndex>,
+													ITakesMessage<AfterUpdateMessage>,
+													ITakesMessage<RemovedFromParent>,
+													ITakesMessage<NewChild>,
+													ITakesMessage<NewParent>,
+													ITakesMessage<StartRendering>,
+													ITakesMessage<StopRendering>,
+													ITakesMessage<AddedToEntity>
 	{
 		private class VertexData
 		{
 			public Vector2d Coordinates;
 			public Vector4 Color;
 			public Vector2 TexCoords;
+			public short TransformIndex;
 
-			public VertexData(Vector2d coords, Vector4 color, Vector2 texCoords)
+			public VertexData(Vector2d coords, Vector4 color, Vector2 texCoords, short transformIndex)
 			{
 				Coordinates = coords;
 				Color = color;
 				TexCoords = texCoords;
+				TransformIndex = transformIndex;
 			}
 
-			public VertexData(Vector2d coords)
+			public VertexData(Vector2d coords, short transformIndex)
 			{
 				Coordinates = coords;
+				TransformIndex = transformIndex;
 			}
 
 			public void WriteToArray(byte[] arr, int index)
@@ -46,12 +56,25 @@ namespace Firefly2.Components
 					writer.Write((byte)(Color.W * 255));
 					writer.Write((byte)(TexCoords.X * 255));
 					writer.Write((byte)(TexCoords.Y * 255));
+					writer.Write(TransformIndex);
+
+					writer.BaseStream.Dispose();
 				}
 			}
 		}
 
 		private bool needsUpdate = false;
 		private Dictionary<uint, VertexData> triangulationMap;
+		private bool rendering = false;
+		private TreeNodeComponent tree
+		{
+			get { return Host.GetComponent<TreeNodeComponent>(); }
+		}
+		private TransformComponent transform
+		{
+			get { return Host.GetComponent<TransformComponent>(); }
+		}
+		private short transformIndex = 0;
 
 		public Renderer Renderer;
 		public byte[] Data;
@@ -75,6 +98,14 @@ namespace Firefly2.Components
 		{
 			Renderer = renderer;
 			triangulationMap = new Dictionary<uint, VertexData>();
+			Data = new byte[0];
+		}
+
+		public void TakeMessage(AddedToEntity msg)
+		{
+			if (transform != null) transformIndex = transform.ObjectIndex;
+
+			needsUpdate = true;
 		}
 
 		public void TakeMessage(GeometryChanged msg)
@@ -99,16 +130,16 @@ namespace Firefly2.Components
 			var poly = Triangulation.MakePolygon(Geometry.Polygon);
 			for (int i = 0; i < poly.Points.Count; ++i)
 			{
-				triangulationMap[poly.Points[i].VertexCode] = new VertexData(Geometry.Polygon[i]);
+				triangulationMap[poly.Points[i].VertexCode] = new VertexData(Geometry.Polygon[i], transformIndex);
 			}
-			if (ShapeColor.Colors.Count == Geometry.Polygon.Count)
+			if (ShapeColor != null && ShapeColor.Colors.Count == Geometry.Polygon.Count)
 			{
 				for (int i = 0; i < ShapeColor.Colors.Count; ++i)
 				{
 					triangulationMap[poly.Points[i].VertexCode].Color = ShapeColor.Colors[i];
 				}
 			}
-			if (Texture.TexCoords.Count == Geometry.Polygon.Count)
+			if (Texture != null && Texture.TexCoords.Count == Geometry.Polygon.Count)
 			{
 				for (int i = 0; i < Texture.TexCoords.Count; ++i)
 				{
@@ -131,6 +162,50 @@ namespace Firefly2.Components
 			Renderer.ProcessRenderBuffer(this);
 
 			needsUpdate = false;
+		}
+
+		public void TakeMessage(NewChild msg)
+		{
+			if (rendering) tree.PropagateMessageDownwards(StartRendering.Instance);
+		}
+
+		public void TakeMessage(RemovedFromParent msg)
+		{
+			if (rendering) StopRender();
+		}
+
+		public void TakeMessage(StartRendering msg)
+		{
+			if (!rendering) StartRender();
+		}
+
+		public void TakeMessage(StopRendering msg)
+		{
+			if (rendering) StopRender();
+		}
+
+		private void StartRender()
+		{
+			rendering = true;
+			tree.PropagateMessageDownwards(StartRendering.Instance);
+		}
+
+		private void StopRender()
+		{
+			rendering = false;
+			Renderer.RemoveRenderBuffer(this);
+			tree.PropagateMessageDownwards(StopRendering.Instance);
+		}
+
+		public void TakeMessage(NewTransformIndex msg)
+		{
+			transformIndex = msg.Index;
+			needsUpdate = true;
+		}
+
+		public void TakeMessage(NewParent msg)
+		{
+			if (tree.Parent.Host is Stage) Host.SendMessage(StartRendering.Instance);
 		}
 	}
 }

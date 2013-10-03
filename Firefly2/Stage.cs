@@ -1,4 +1,5 @@
 ﻿using Firefly2.Components;
+using Firefly2.Facilities;
 using Firefly2.Messages;
 using OpenTK;
 using OpenTK.Graphics;
@@ -13,6 +14,7 @@ namespace Firefly2
 {
 	public class Stage : Entity
 	{
+		public Renderer Renderer;
 		public GameWindow Window;
 
 		protected TreeNodeComponent TreeNode
@@ -39,8 +41,10 @@ namespace Firefly2
 
 			Window.UpdateFrame += delegate(object target, FrameEventArgs args)
 			{
+				Window.Title = Window.UpdateFrequency + ", " + Window.RenderFrequency;
 				TreeNode.PropagateMessageDownwards(new UpdateMessage(args.Time));
 				TreeNode.PropagateMessageDownwards(new AfterUpdateMessage(args.Time));
+				Renderer.FinishUpdate();
 			};
 
 			Window.RenderFrame += delegate
@@ -48,12 +52,18 @@ namespace Firefly2
 				GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.StencilBufferBit);
 
 				//RENDER
+				Renderer.Render();
 
 				Window.SwapBuffers();
 			};
 
 			Components.Add(new TreeNodeComponent());
 
+			Renderer = new Renderer(width, height);
+		}
+
+		public void Run()
+		{
 			Window.Run();
 		}
 	}

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Firefly2
+namespace Firefly2.Facilities
 {
-	public interface IMessageResponder<Message, Response>
+	public class Camera
 	{
-		Response HandleMessage(Message msg);
+
 	}
 }

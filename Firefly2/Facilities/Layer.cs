@@ -1,7 +1,11 @@
 ﻿using Firefly2.Components;
+using Firefly2.Exceptions;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,95 +25,39 @@ namespace Firefly2.Facilities
 			}
 		}
 
-		private class Parcel
-		{
-			public int Index;
-			public int Size;
-
-			public Parcel(int index, int size)
-			{
-				Index = index;
-				Size = size;
-			}
-		}
-
-		private class Chunk
-		{
-			private byte[] data;
-			private List<Parcel> parcels;
-			private int filledSize;
-
-			public Chunk()
-			{
-				data = new byte[((2 * 4 + 4 + 2 + 2) * 3) * 5000];
-				parcels = new List<Parcel>();
-			}
-
-			/// <summary>
-			/// Returns true if the new data was successfully refited in this chunk. 
-			/// Otherwise it just removes the previous version and returns false.
-			/// </summary>
-			/// <param name="parcel"></param>
-			/// <param name="newData"></param>
-			/// <returns></returns>
-			public bool TryModify(Parcel parcel, byte[] newData)
-			{
-				int index = parcels.IndexOf(parcel);
-				if (index != -1)
-				{
-					if (parcel.Size != newData.Length)
-					{
-						parcels.RemoveAt(index);
-						Refit();
-					}
-					else
-					{
-						Buffer.BlockCopy(newData, 0, data, parcel.Index, newData.Length);
-						return true;
-					}
-				}
-				return TryAdd(parcel, newData);
-			}
-
-			/// <summary>
-			/// Add new data to the chunk. Returns true if there's room, otherwise false.
-			/// </summary>
-			/// <param name="oldParcel">Parcel that will contain new data if there was room</param>
-			/// <param name="newData"></param>
-			/// <returns></returns>
-			public bool TryAdd(Parcel oldParcel, byte[] newData)
-			{
-				if (filledSize + newData.Length >= data.Length) return false;
-				Buffer.BlockCopy(newData, 0, data, filledSize, newData.Length);
-				oldParcel.Index = filledSize;
-				oldParcel.Size = newData.Length;
-				filledSize += newData.Length;
-				return true;
-			}
-
-			private void Refit()
-			{
-				int copyTo = 0;
-				for (int i = 0; i < parcels.Count; ++i)
-				{
-					if (parcels[i].Index != copyTo)
-					{
-						Buffer.BlockCopy(data, parcels[i].Index, data, copyTo, parcels[i].Size);
-						parcels[i].Index = copyTo;
-						copyTo += parcels[i].Size;
-					}
-				}
-				filledSize = copyTo;
-			}
-		}
-
 		private List<Chunk> chunks;
 		private Dictionary<RenderBufferComponent, Location> bufferMap;
+		private SortedSet<short> freeIndices;
+		private Dictionary<TransformComponent, short> transformMap;
+		private float[] uniforms;
+		private int tbo;
+		private int texture;
+		private ShaderProgramInfo shaderInfo;
+		private bool needsUpdate = false;
+		private const int elementsPerMatrix = 6;
 
-		public Layer()
+		public Layer(ShaderProgramInfo shaderInfo)
 		{
 			chunks = new List<Chunk>();
 			bufferMap = new Dictionary<RenderBufferComponent, Location>();
+			transformMap = new Dictionary<TransformComponent, short>();
+			freeIndices = new SortedSet<short>();
+			uniforms = new float[1024 * 8 * elementsPerMatrix];
+			uniforms[0] = 1;
+			uniforms[3] = 1;
+			for (short i = 1; i < uniforms.Length / elementsPerMatrix; ++i) freeIndices.Add(i);
+
+			this.shaderInfo = shaderInfo;
+
+			GL.GenBuffers(1, out tbo);
+			GL.BindBuffer(BufferTarget.TextureBuffer, tbo);
+			GL.BufferData<float>(
+				BufferTarget.TextureBuffer,
+				(IntPtr)(uniforms.Length * sizeof(float)),
+				uniforms, BufferUsageHint.StreamDraw);
+			texture = GL.GenTexture();
+			GL.BindTexture(TextureTarget.TextureBuffer, texture);
+			GL.TexBuffer(TextureBufferTarget.TextureBuffer, SizedInternalFormat.R32f, tbo);
 		}
 
 		public void ModifyOrAdd(RenderBufferComponent buffer)
@@ -132,7 +80,7 @@ namespace Firefly2.Facilities
 					}
 					if (!added)
 					{
-						var chunk = new Chunk();
+						var chunk = new Chunk(shaderInfo);
 						chunks.Add(chunk);
 						chunk.TryAdd(loc.Parcel, buffer.Data);
 						loc.Chunk = chunk;
@@ -145,12 +93,78 @@ namespace Firefly2.Facilities
 				var chunk = chunks.FirstOrDefault(c => c.TryAdd(parcel, buffer.Data));
 				if (chunk == null)
 				{
-					chunk = new Chunk();
+					chunk = new Chunk(shaderInfo);
 					chunks.Add(chunk);
 					chunk.TryAdd(parcel, buffer.Data);
 				}
 				bufferMap[buffer] = new Location(chunk, parcel);
 			}
+		}
+
+		private static byte[] emptyByteArray = new byte[0];
+		public void Remove(RenderBufferComponent buffer)
+		{
+			if (bufferMap.ContainsKey(buffer))
+			{
+				var loc = bufferMap[buffer];
+				loc.Chunk.TryModify(loc.Parcel, emptyByteArray);
+			}
+		}
+
+		public short ModifyOrAdd(TransformComponent transform)
+		{
+			if (!transformMap.ContainsKey(transform))
+			{
+				if (freeIndices.Count == 0) throw new LayerFullException();
+				transformMap[transform] = freeIndices.First();
+				freeIndices.Remove(freeIndices.First());
+			}
+			int index = transformMap[transform] * elementsPerMatrix;
+			int offset = 0;
+			for (int i = 0; i < 2; ++i)
+			{
+				for (int j = 0; j < 2; ++j)
+				{
+					uniforms[index + offset] = transform.ModelMatrix[i, j];
+					offset++;
+				}
+			}
+			uniforms[index + offset] = (float)transform.X;
+			uniforms[index + offset + 1] = (float)transform.Y;
+			needsUpdate = true;
+
+			return transformMap[transform];
+		}
+
+		public void Remove(TransformComponent transform)
+		{
+			if (transformMap.ContainsKey(transform))
+			{
+				freeIndices.Add(transformMap[transform]);
+				transformMap.Remove(transform);
+			}
+		}
+
+		public void FinishUpdate()
+		{
+			if (!needsUpdate) return;
+
+			GL.BindBuffer(BufferTarget.TextureBuffer, tbo);
+			GL.BufferData<float>(
+				BufferTarget.TextureBuffer,
+				(IntPtr)(uniforms.Length * sizeof(float)),
+				uniforms, BufferUsageHint.StreamDraw);
+
+			needsUpdate = false;
+		}
+
+		public void Render()
+		{
+			GL.UseProgram(shaderInfo.ShaderProgram);
+			GL.BindTexture(TextureTarget.TextureBuffer, texture);
+			GL.Uniform1(shaderInfo.TexBuffer, 0);
+			GL.UniformMatrix4(shaderInfo.WindowLocation, false, ref shaderInfo.Window);
+			foreach (var chunk in chunks) chunk.Render();
 		}
 	}
 }

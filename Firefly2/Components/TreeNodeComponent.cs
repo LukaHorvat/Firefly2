@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,8 +25,8 @@ namespace Firefly2.Components
 					var comp = children[index].Host.GetComponent<Comp>();
 					if (comp != null)
 					{
-						var func = comp as IMessageResponder<Query, Answer>;
-						return results[index] = func != null ? func.HandleMessage(query) : default(Answer);
+						var func = comp as IAnswersMessage<Query, Answer>;
+						return results[index] = func != null ? func.AnswerMessage(query) : default(Answer);
 					}
 					else
 					{
@@ -80,6 +81,27 @@ namespace Firefly2.Components
 		{
 			Parent = parent;
 			Children = new ObservableCollection<TreeNodeComponent>();
+
+			Children.CollectionChanged += delegate(object target, NotifyCollectionChangedEventArgs args)
+			{
+				if (args.NewItems != null)
+				{
+					foreach (TreeNodeComponent child in args.NewItems)
+					{
+						child.Parent = this;
+						child.Host.SendMessage(NewParent.Instance);
+						Host.SendMessage(new NewChild(child));
+					}
+				}
+				if (args.OldItems != null)
+				{
+					foreach (TreeNodeComponent child in args.NewItems)
+					{
+						child.Parent = null;
+						child.Host.SendMessage(RemovedFromParent.Instance);
+					}
+				}
+			};
 		}
 
 		public QueryResults<Query, Answer, Comp> QueryChildren<Query, Answer, Comp>(Query query) where Comp : Component
@@ -102,8 +124,8 @@ namespace Firefly2.Components
 				var comp = Parent.Host.GetComponent<Comp>();
 				if (comp != null)
 				{
-					var func = comp as IMessageResponder<Query, Answer>;
-					return func != null ? func.HandleMessage(query) : default(Answer);
+					var func = comp as IAnswersMessage<Query, Answer>;
+					return func != null ? func.AnswerMessage(query) : default(Answer);
 				}
 				else
 				{
@@ -127,6 +149,16 @@ namespace Firefly2.Components
 		/// <typeparam name="Message"></typeparam>
 		/// <param name="msg"></param>
 		public void PropagateMessageDownwards<Message>(Message msg)
+		{
+			foreach (var tree in Children) tree.PropagateMessageDownwardsIncludingThis(msg);
+		}
+
+		/// <summary>
+		/// Sends message downwards (parent -> child). Depth-first. First sends message to this entity.
+		/// </summary>
+		/// <typeparam name="Message"></typeparam>
+		/// <param name="msg"></param>
+		public void PropagateMessageDownwardsIncludingThis<Message>(Message msg)
 		{
 			Host.SendMessage(msg);
 			foreach (var tree in Children) tree.PropagateMessageDownwards(msg);

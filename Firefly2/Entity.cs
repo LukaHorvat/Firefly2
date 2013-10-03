@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Firefly2.Messages;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -20,8 +21,24 @@ namespace Firefly2
 
 			Components.CollectionChanged += delegate(object target, NotifyCollectionChangedEventArgs args)
 			{
-				foreach (Component component in args.NewItems) componentsByName[component.Name] = component;
-				foreach (Component component in args.OldItems) componentsByName.Remove(component.Name);
+				if (args.NewItems != null)
+				{
+					foreach (Component component in args.NewItems)
+					{
+						componentsByName[component.Name] = component;
+						component.Host = this;
+						var func = component as ITakesMessage<AddedToEntity>;
+						if (func != null) func.TakeMessage(AddedToEntity.Instance);
+					}
+				}
+				if (args.OldItems != null)
+				{
+					foreach (Component component in args.OldItems)
+					{
+						componentsByName.Remove(component.Name);
+						component.Host = null;
+					}
+				}
 			};
 		}
 
@@ -45,7 +62,7 @@ namespace Firefly2
 		{
 			for (int i = 0; i < Components.Count; ++i)
 			{
-				var func = Components[i] as IMessageTaker<T>;
+				var func = Components[i] as ITakesMessage<T>;
 				if (func != null) func.TakeMessage(message);
 			}
 		}
