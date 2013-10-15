@@ -4,3 +4,5 @@ C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\bin\Debug\
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\bin\Debug\OpenTK.dll
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\obj\Debug\Firefly2.dll
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\obj\Debug\Firefly2.pdb
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\bin\Debug\OpenTK.pdb
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\bin\Debug\OpenTK.xml

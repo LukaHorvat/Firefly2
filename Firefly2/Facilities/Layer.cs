@@ -129,8 +129,8 @@ namespace Firefly2.Facilities
 					offset++;
 				}
 			}
-			uniforms[index + offset] = (float)transform.X;
-			uniforms[index + offset + 1] = (float)transform.Y;
+			uniforms[index + offset] = (float)transform.ModelMatrix[3, 0];
+			uniforms[index + offset + 1] = (float)transform.ModelMatrix[3, 1];
 			needsUpdate = true;
 
 			return transformMap[transform];

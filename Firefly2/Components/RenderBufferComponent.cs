@@ -166,7 +166,7 @@ namespace Firefly2.Components
 
 		public void TakeMessage(NewChild msg)
 		{
-			if (rendering) tree.PropagateMessageDownwards(StartRendering.Instance);
+			if (rendering) tree.Send(StartRendering.Instance, TreeNodeComponent.SendRange.ImmediateChildrenOnly);
 		}
 
 		public void TakeMessage(RemovedFromParent msg)
@@ -187,14 +187,15 @@ namespace Firefly2.Components
 		private void StartRender()
 		{
 			rendering = true;
-			tree.PropagateMessageDownwards(StartRendering.Instance);
+			needsUpdate = true;
+			tree.Send(StartRendering.Instance, TreeNodeComponent.SendRange.ImmediateChildrenOnly);
 		}
 
 		private void StopRender()
 		{
 			rendering = false;
 			Renderer.RemoveRenderBuffer(this);
-			tree.PropagateMessageDownwards(StopRendering.Instance);
+			tree.Send(StopRendering.Instance, TreeNodeComponent.SendRange.ImmediateChildrenOnly);
 		}
 
 		public void TakeMessage(NewTransformIndex msg)

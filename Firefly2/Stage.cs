@@ -25,6 +25,14 @@ namespace Firefly2
 			}
 		}
 
+		protected UpdateComponent Update
+		{
+			get
+			{
+				return GetComponent<UpdateComponent>();
+			}
+		}
+
 		public Stage(int width, int height, string title)
 		{
 			Window = new GameWindow(
@@ -41,9 +49,13 @@ namespace Firefly2
 
 			Window.UpdateFrame += delegate(object target, FrameEventArgs args)
 			{
+				var updateMessage = new UpdateMessage(args.Time);
+				var afterUpdateMessage = new AfterUpdateMessage(args.Time);
 				Window.Title = Window.UpdateFrequency + ", " + Window.RenderFrequency;
-				TreeNode.PropagateMessageDownwards(new UpdateMessage(args.Time));
-				TreeNode.PropagateMessageDownwards(new AfterUpdateMessage(args.Time));
+				TreeNode.Send(updateMessage, TreeNodeComponent.SendRange.WholeTree);
+				Update.TakeMessage(updateMessage);
+				TreeNode.Send(afterUpdateMessage, TreeNodeComponent.SendRange.WholeTree);
+				Update.TakeMessage(afterUpdateMessage);
 				Renderer.FinishUpdate();
 			};
 
@@ -58,6 +70,7 @@ namespace Firefly2
 			};
 
 			Components.Add(new TreeNodeComponent());
+			Components.Add(new UpdateComponent());
 
 			Renderer = new Renderer(width, height);
 		}

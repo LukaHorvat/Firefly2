@@ -32,10 +32,10 @@ namespace BuildProject
 			GetComponent<ShapeColorComponent>().Colors.Add(new Vector4(1, 1, 0, 1));
 			GetComponent<ShapeColorComponent>().Colors.Add(new Vector4(0, 0, 1, 1));
 			GetComponent<TransformComponent>().Rotation = Math.PI / 8;
-			GetComponent<UpdateComponent>().Update += delegate (UpdateMessage msg)
-			{
-				transform.Rotation += 6F * msg.DeltaTime;
-			};
+			//GetComponent<UpdateComponent>().Update += delegate(UpdateMessage msg)
+			//{
+			//	transform.Rotation += 6F * msg.DeltaTime;
+			//};
 		}
 	}
 }

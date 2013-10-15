@@ -8,3 +8,5 @@ C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\obj\De
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\obj\Debug\BuildProject.exe
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\obj\Debug\BuildProject.pdb
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\Poly2Tri.dll
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\OpenTK.pdb
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\OpenTK.xml

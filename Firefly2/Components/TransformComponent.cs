@@ -87,9 +87,10 @@ namespace Firefly2.Components
 
 		private void RegenerateMatrix()
 		{
-			ModelMatrix = lastParentMatrix * personalMatrix;
+			Matrix4.Mult(ref personalMatrix, ref lastParentMatrix, out ModelMatrix);
+			//ModelMatrix = lastParentMatrix * personalMatrix;
 			Renderer.ProcessTransform(this);
-			if (tree != null) tree.PropagateMessageDownwards(new ParentTransformChanged(ModelMatrix));
+			if (tree != null) tree.Send(new ParentTransformChanged(ModelMatrix), TreeNodeComponent.SendRange.ImmediateChildrenOnly);
 		}
 
 		public void TakeMessage(NewChild msg)

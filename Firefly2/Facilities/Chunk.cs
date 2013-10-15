@@ -77,6 +77,7 @@ namespace Firefly2.Facilities
 			Buffer.BlockCopy(newData, 0, data, filledSize, newData.Length);
 			oldParcel.Index = filledSize;
 			oldParcel.Size = newData.Length;
+			parcels.Add(oldParcel);
 			filledSize += newData.Length;
 
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);

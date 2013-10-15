@@ -11,40 +11,40 @@ namespace Firefly2.Components
 {
 	public class TreeNodeComponent : Component
 	{
-		public class QueryResults<Query, Answer, Comp> where Comp : Component
+		public class QueryResults<TQuery, TAnswer, TComp> where TComp : Component
 		{
-			private ObservableCollection<TreeNodeComponent> children;
-			private Query query;
-			private Dictionary<int, Answer> results;
+			private IList<TreeNodeComponent> children;
+			private TQuery query;
+			private Dictionary<int, TAnswer> results;
 
-			private Answer GetAtIndex(int index)
+			private TAnswer GetAtIndex(int index)
 			{
 				if (results.ContainsKey(index)) return results[index];
 				else
 				{
-					var comp = children[index].Host.GetComponent<Comp>();
+					var comp = children[index].Host.GetComponent<TComp>();
 					if (comp != null)
 					{
-						var func = comp as IAnswersMessage<Query, Answer>;
-						return results[index] = func != null ? func.AnswerMessage(query) : default(Answer);
+						var func = comp as IAnswersMessage<TQuery, TAnswer>;
+						return results[index] = func != null ? func.AnswerMessage(query) : default(TAnswer);
 					}
 					else
 					{
-						return results[index] = default(Answer);
+						return results[index] = default(TAnswer);
 					}
 				}
 			}
 
-			public QueryResults(ObservableCollection<TreeNodeComponent> children, Query query)
+			public QueryResults(IList<TreeNodeComponent> children, TQuery query)
 			{
 				this.children = children;
 				this.query = query;
-				results = new Dictionary<int, Answer>();
+				results = new Dictionary<int, TAnswer>();
 			}
 
-			public List<Answer> ToList()
+			public List<TAnswer> ToList()
 			{
-				var list = new List<Answer>();
+				var list = new List<TAnswer>();
 				for (int i = 0; i < children.Count; ++i)
 				{
 					list.Add(GetAtIndex(i));
@@ -52,7 +52,7 @@ namespace Firefly2.Components
 				return list;
 			}
 
-			public bool Any(Func<Answer, bool> func)
+			public bool Any(Func<TAnswer, bool> func)
 			{
 				for (int i = 0; i < children.Count; ++i)
 				{
@@ -61,7 +61,7 @@ namespace Firefly2.Components
 				return false;
 			}
 
-			public bool All(Func<Answer, bool> func)
+			public bool All(Func<TAnswer, bool> func)
 			{
 				for (int i = 0; i < children.Count; ++i)
 				{
@@ -69,6 +69,28 @@ namespace Firefly2.Components
 				}
 				return true;
 			}
+		}
+
+		public enum SendRange
+		{
+			Parent,
+			ImmediateChildrenOnly,
+			WholeTree
+		}
+
+		public enum QueryRange
+		{
+			Parent,
+			ImmediateChildrenOnly,
+			/// <summary>
+			/// Propagates down the tree, skipping nodes that don't have the target component, 
+			/// but stops at nodes do
+			/// </summary>
+			StopAtReceivers,
+			/// <summary>
+			/// Propagates down the tree, skipping nodes that don't have the target component
+			/// </summary>
+			WholeTree
 		}
 
 		public ObservableCollection<TreeNodeComponent> Children;
@@ -104,64 +126,89 @@ namespace Firefly2.Components
 			};
 		}
 
-		public QueryResults<Query, Answer, Comp> QueryChildren<Query, Answer, Comp>(Query query) where Comp : Component
+		public void AddChild(Entity entity)
 		{
-			return new QueryResults<Query, Answer, Comp>(Children, query);
+			Children.Add(entity.GetComponent<TreeNodeComponent>());
 		}
 
-		public void SendMessageToChildren<Query>(Query query)
+		public void RemoveChild(Entity entity)
 		{
-			for (int i = 0; i < Children.Count; ++i)
-			{
-				Children[i].Host.SendMessage<Query>(query);
-			}
+			Children.Remove(entity.GetComponent<TreeNodeComponent>());
 		}
 
-		public Answer QueryParent<Query, Answer, Comp>(Query query) where Comp : Component
+		/// <summary>
+		/// Propagates message down the tree with variable range
+		/// </summary>
+		/// <typeparam name="TMessage"></typeparam>
+		/// <param name="message"></param>
+		/// <param name="range">Specifies which nodes the message should be sent to</param>
+		public void Send<TMessage>(TMessage message, SendRange range)
 		{
-			if (Parent != null)
+			if (range == SendRange.Parent && Parent != null) Parent.Host.SendMessage(message); 
+			BFS(node =>
 			{
-				var comp = Parent.Host.GetComponent<Comp>();
-				if (comp != null)
+				node.Host.SendMessage(message);
+				return range == SendRange.WholeTree;
+			});
+		}
+
+		/// <summary>
+		/// Propagates message down the tree, stopping at nodes that contain the specified component
+		/// </summary>
+		/// <typeparam name="TMessage"></typeparam>
+		/// <typeparam name="TComponent"></typeparam>
+		/// <param name="message"></param>
+		public void Send<TMessage, TComponent>(TMessage message)
+			where TComponent : Component
+		{
+			BFS(node =>
+			{
+				if (node.Host.GetComponent<TComponent>() != null)
 				{
-					var func = comp as IAnswersMessage<Query, Answer>;
-					return func != null ? func.AnswerMessage(query) : default(Answer);
+					node.Host.SendMessage(message);
+					return false;
+				}
+				return true;
+			});
+		}
+
+		private static List<TreeNodeComponent> empty = new List<TreeNodeComponent>();
+		public QueryResults<TQuery, TAnswer, TComp> Query<TQuery, TAnswer, TComp>(TQuery query, QueryRange range)
+			where TComp : Component
+		{
+			if (range == QueryRange.Parent)
+			{
+				if (Parent != null) return new QueryResults<TQuery, TAnswer, TComp>(new List<TreeNodeComponent>() { Parent }, query);
+				else return new QueryResults<TQuery, TAnswer, TComp>(empty, query);
+			}
+			var list = new List<TreeNodeComponent>();
+			BFS(node =>
+			{
+				bool isTarget = node.Host.GetComponent<TComp>() != null;
+				if (isTarget)
+				{
+					list.Add(node);
+					if (range == QueryRange.WholeTree) return true;
+					return false;
 				}
 				else
 				{
-					return default(Answer);
+					if (range == QueryRange.ImmediateChildrenOnly) return false;
+					return true;
 				}
-			}
-			else return default(Answer);
+			});
+			return new QueryResults<TQuery, TAnswer, TComp>(list, query);
 		}
 
-		public void SendMessageToParent<Query>(Query query)
+		private void BFS(Func<TreeNodeComponent, bool> func)
 		{
-			if (Parent != null)
+			var queue = new Queue<TreeNodeComponent>();
+			foreach (var child in Children) queue.Enqueue(child);
+			while (queue.Count > 0)
 			{
-				Parent.Host.SendMessage<Query>(query);
+				var node = queue.Dequeue();
+				if (func(node)) foreach (var child in node.Children) queue.Enqueue(child);
 			}
-		}
-
-		/// <summary>
-		/// Sends message downwards (parent -> child). Depth-first.
-		/// </summary>
-		/// <typeparam name="Message"></typeparam>
-		/// <param name="msg"></param>
-		public void PropagateMessageDownwards<Message>(Message msg)
-		{
-			foreach (var tree in Children) tree.PropagateMessageDownwardsIncludingThis(msg);
-		}
-
-		/// <summary>
-		/// Sends message downwards (parent -> child). Depth-first. First sends message to this entity.
-		/// </summary>
-		/// <typeparam name="Message"></typeparam>
-		/// <param name="msg"></param>
-		public void PropagateMessageDownwardsIncludingThis<Message>(Message msg)
-		{
-			Host.SendMessage(msg);
-			foreach (var tree in Children) tree.PropagateMessageDownwards(msg);
 		}
 	}
 }

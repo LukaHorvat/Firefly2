@@ -15,7 +15,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -30,8 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenTK">
-      <HintPath>..\..\Space\Space\bin\Debug\OpenTK.dll</HintPath>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\opentk\Binaries\OpenTK\Debug\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="Poly2Tri, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -49,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Component.cs" />
     <Compile Include="Components\GeometryComponent.cs" />
+    <Compile Include="Components\MouseInteractionComponent.cs" />
     <Compile Include="Components\RenderBufferComponent.cs" />
     <Compile Include="Components\ShapeColorComponent.cs" />
     <Compile Include="Components\TextureComponent.cs" />
@@ -74,6 +76,7 @@
     <Compile Include="Messages\NewParent.cs" />
     <Compile Include="Messages\NewTransformIndex.cs" />
     <Compile Include="Messages\ParentTransformChanged.cs" />
+    <Compile Include="Messages\Querying\MouseIntersect.cs" />
     <Compile Include="Messages\RemovedFromParent.cs" />
     <Compile Include="Messages\ShapeColorChanged.cs" />
     <Compile Include="Messages\StartRendering.cs" />
