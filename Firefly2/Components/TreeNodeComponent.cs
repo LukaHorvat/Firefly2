@@ -1,4 +1,5 @@
-﻿using Firefly2.Messages;
+﻿using Firefly2.Facilities;
+using Firefly2.Messages;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -96,11 +97,14 @@ namespace Firefly2.Components
 		public ObservableCollection<TreeNodeComponent> Children;
 		public TreeNodeComponent Parent;
 
+		private List<Link> uplinks;
+
 		public TreeNodeComponent() : this(null) { }
 
 		public TreeNodeComponent(TreeNodeComponent parent)
 			: base()
 		{
+			uplinks = new List<Link>();
 			Parent = parent;
 			Children = new ObservableCollection<TreeNodeComponent>();
 
@@ -110,15 +114,24 @@ namespace Firefly2.Components
 				{
 					foreach (TreeNodeComponent child in args.NewItems)
 					{
+						if (child.Parent != null) throw new Exception("Child already has a parent");
 						child.Parent = this;
+						//This will call the RestoreUplink method AND supply the generic parameter
+						foreach (var uplink in child.uplinks) uplink.CallGenericRelink(child);
+
 						child.Host.SendMessage(NewParent.Instance);
 						Host.SendMessage(new NewChild(child));
 					}
 				}
 				if (args.OldItems != null)
 				{
-					foreach (TreeNodeComponent child in args.NewItems)
+					foreach (TreeNodeComponent child in args.OldItems)
 					{
+						foreach (var uplink in child.uplinks)
+						{
+							uplink.SetAndCastComponent(null);
+							RemoveUplink(uplink);
+						}
 						child.Parent = null;
 						child.Host.SendMessage(RemovedFromParent.Instance);
 					}
@@ -136,6 +149,42 @@ namespace Firefly2.Components
 			Children.Remove(entity.GetComponent<TreeNodeComponent>());
 		}
 
+		public Link<T> LinkUp<T>()
+			where T : Component
+		{
+			var link = new Link<T>();
+			uplinks.Add(link);
+			RestoreUplink(link);
+			return link;
+		}
+
+		public void RestoreUplink<T>(Link<T> link)
+			where T : Component
+		{
+			var current = Parent;
+			while (current != null)
+			{
+				var comp = current.Host.GetComponent<T>();
+				if (comp != null)
+				{
+					link.SetAndCastComponent(comp);
+					break;
+				}
+				current.uplinks.Add(link);
+				current = current.Parent;
+			}
+		}
+
+		public void RemoveUplink(Link link)
+		{
+			var current = this;
+			while (current.uplinks.Remove(link))
+			{
+				current = current.Parent;
+				if (current == null) break;
+			}
+		}
+
 		/// <summary>
 		/// Propagates message down the tree with variable range
 		/// </summary>
@@ -144,7 +193,7 @@ namespace Firefly2.Components
 		/// <param name="range">Specifies which nodes the message should be sent to</param>
 		public void Send<TMessage>(TMessage message, SendRange range)
 		{
-			if (range == SendRange.Parent && Parent != null) Parent.Host.SendMessage(message); 
+			if (range == SendRange.Parent && Parent != null) Parent.Host.SendMessage(message);
 			BFS(node =>
 			{
 				node.Host.SendMessage(message);

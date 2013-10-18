@@ -21,20 +21,14 @@ namespace BuildProject
 			var rand = new Random();
 
 			var stage = new Stage(800, 500, "Test");
-			var stick1 = new Stick(stage, "a");
-			var stick2 = new Stick(stage, "b");
-			stick2.GetComponent<TransformComponent>().X = 100;
-			stage.GetComponent<TreeNodeComponent>().AddChild(stick1);
-			stick1.GetComponent<TreeNodeComponent>().AddChild(stick2);
-			stick1.GetComponent<TransformComponent>().X = 1;
+			var a = new Node();
+			var b = new Node();
+			var c = new Node();
 
-			stage.GetComponent<UpdateComponent>().AfterUpdate += delegate
-			{
-				stick1.Transform.Rotation += 0.01;
-				//stick1.GetComponent<TransformComponent>().Rotation += 0.01;
-				//stick2.GetComponent<TransformComponent>().Rotation += 0.01;
-				//Console.WriteLine(stick2.GetComponent<TransformComponent>().X);
-			};
+			a.Tree.AddChild(b);
+			b.Tree.AddChild(c);
+
+			var link = c.Tree.LinkUp<UpdateComponent>();
 
 			stage.Run();
 

@@ -17,6 +17,7 @@ namespace Firefly2.Facilities
 		private ShaderProgramInfo shaderInfo;
 
 		public int ShaderProgram;
+		public Matrix4 WindowMatrix;
 
 		public Renderer(int width, int height)
 		{
@@ -42,12 +43,12 @@ namespace Firefly2.Facilities
 			GL.LinkProgram(ShaderProgram);
 
 			window = GL.GetUniformLocation(ShaderProgram, "window");
-			windowMatrix = Matrix4.CreateScale(2F / width, -2F / height, 1);
+			WindowMatrix = Matrix4.CreateScale(2F / width, -2F / height, 1);
 
 			shaderInfo = new ShaderProgramInfo
 			{
 				ShaderProgram = ShaderProgram,
-				Window = windowMatrix,
+				Window = WindowMatrix,
 				VertexPosition = GL.GetAttribLocation(ShaderProgram, "vertex_position"),
 				VertexColor = GL.GetAttribLocation(ShaderProgram, "vertex_color"),
 				VertexTexCoords = GL.GetAttribLocation(ShaderProgram, "vertex_texcoords"),

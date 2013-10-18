@@ -63,6 +63,7 @@
     <Compile Include="Facilities\Chunk.cs" />
     <Compile Include="Facilities\DefaultShaders.cs" />
     <Compile Include="Facilities\Layer.cs" />
+    <Compile Include="Facilities\Link.cs" />
     <Compile Include="Facilities\Renderer.cs" />
     <Compile Include="Facilities\ShaderProgramInfo.cs" />
     <Compile Include="Geometry\Triangle.cs" />

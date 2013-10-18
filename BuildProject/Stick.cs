@@ -26,6 +26,7 @@ namespace BuildProject
 			Components.Add(new RenderBufferComponent(stage.Renderer));
 			Components.Add(new TreeNodeComponent());
 			Components.Add(new UpdateComponent());
+			Components.Add(new MouseInteractionComponent());
 			GetComponent<GeometryComponent>().Polygon.Add(new Vector2d(0, 5));
 			GetComponent<GeometryComponent>().Polygon.Add(new Vector2d(100, 5));
 			GetComponent<GeometryComponent>().Polygon.Add(new Vector2d(100, -5));
