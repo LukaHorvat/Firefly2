@@ -97,14 +97,16 @@ namespace Firefly2.Components
 		public ObservableCollection<TreeNodeComponent> Children;
 		public TreeNodeComponent Parent;
 
-		private List<Link> uplinks;
+		private LinkedList<Uplink> uplinks;
+		private LinkedList<Downlink> downlinks;
 
 		public TreeNodeComponent() : this(null) { }
 
 		public TreeNodeComponent(TreeNodeComponent parent)
 			: base()
 		{
-			uplinks = new List<Link>();
+			uplinks = new LinkedList<Uplink>();
+			downlinks = new LinkedList<Downlink>();
 			Parent = parent;
 			Children = new ObservableCollection<TreeNodeComponent>();
 
@@ -129,7 +131,7 @@ namespace Firefly2.Components
 					{
 						foreach (var uplink in child.uplinks)
 						{
-							uplink.SetAndCastComponent(null);
+							uplink.CastAndSetComponent(null);
 							RemoveUplink(uplink);
 						}
 						child.Parent = null;
@@ -149,16 +151,16 @@ namespace Firefly2.Components
 			Children.Remove(entity.GetComponent<TreeNodeComponent>());
 		}
 
-		public Link<T> LinkUp<T>()
+		public Uplink<T> CreateUplink<T>()
 			where T : Component
 		{
-			var link = new Link<T>();
-			uplinks.Add(link);
+			var link = new Uplink<T>();
+			uplinks.AddLast(link);
 			RestoreUplink(link);
 			return link;
 		}
 
-		public void RestoreUplink<T>(Link<T> link)
+		public void RestoreUplink<T>(Uplink<T> link)
 			where T : Component
 		{
 			var current = Parent;
@@ -167,15 +169,15 @@ namespace Firefly2.Components
 				var comp = current.Host.GetComponent<T>();
 				if (comp != null)
 				{
-					link.SetAndCastComponent(comp);
+					link.CastAndSetComponent(comp);
 					break;
 				}
-				current.uplinks.Add(link);
+				current.uplinks.AddLast(link);
 				current = current.Parent;
 			}
 		}
 
-		public void RemoveUplink(Link link)
+		public void RemoveUplink(Uplink link)
 		{
 			var current = this;
 			while (current.uplinks.Remove(link))
@@ -183,6 +185,44 @@ namespace Firefly2.Components
 				current = current.Parent;
 				if (current == null) break;
 			}
+		}
+
+		public Downlink<T> CreateDownlink<T>()
+			where T : Component
+		{
+			var link = new Downlink<T>();
+			downlinks.AddLast(link);
+			RestoreDownlink(link);
+			return link;
+		}
+
+		public void RestoreDownlink<T>(Downlink<T> link)
+			where T : Component
+		{
+			BFS(node =>
+			{
+				var comp = node.Host.GetComponent<T>();
+				if (comp != null)
+				{
+					link.CastAndAddComponent(comp);
+					return false;
+				}
+				node.downlinks.AddLast(link);
+				return true;
+			});
+		}
+
+		public void RemoveDownlink(Downlink link)
+		{
+			BFS(node =>
+			{
+				if (downlinks.Remove(link))
+				{
+					return true;
+				}
+				link.RemoveMatchingComponent(this);
+				return false;
+			});
 		}
 
 		/// <summary>
