@@ -66,6 +66,8 @@ namespace Firefly2
 						{
 							field(this, component);
 						}
+
+						SendMessage(new ComponentCollectionChanged(component, ComponentCollectionChanged.ChangeType.Add));
 					}
 				}
 				if (args.OldItems != null)
@@ -80,6 +82,8 @@ namespace Firefly2
 						{
 							field(this, null);
 						}
+
+						SendMessage(new ComponentCollectionChanged(component, ComponentCollectionChanged.ChangeType.Remove));
 					}
 				}
 			};

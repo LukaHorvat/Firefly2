@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Firefly2.Components
 {
-	public class TreeNodeComponent : Component
+	public class TreeNodeComponent : Component, ITakesMessage<ComponentCollectionChanged>
 	{
 		public class QueryResults<TQuery, TAnswer, TComp> where TComp : Component
 		{
@@ -297,6 +297,50 @@ namespace Firefly2.Components
 			{
 				var node = queue.Dequeue();
 				if (func(node)) foreach (var child in node.Children) queue.Enqueue(child);
+			}
+		}
+
+		public void TakeMessage(ComponentCollectionChanged msg)
+		{
+			if (msg.Type == ComponentCollectionChanged.ChangeType.Add)
+			{
+				var ulinks = uplinks.Where(link => link.ContainsComponentsLike(msg.Target));
+				if (ulinks.Count() > 0)
+				{
+					if (Parent != null) Parent.RemoveUplink(ulinks.First());
+					ulinks.First().CastAndSetComponent(msg.Target);
+				}
+				var dlinks = downlinks.Where(link => link.ContainsComponentsLike(msg.Target));
+				if (dlinks.Count() > 0)
+				{
+					foreach (var child in Children) child.RemoveDownlink(dlinks.First());
+					dlinks.First().CastAndAddComponent(msg.Target);
+				}
+			}
+			else if (msg.Type == ComponentCollectionChanged.ChangeType.Remove)
+			{
+				foreach (var child in Children)
+				{
+					foreach (var uplink in child.uplinks)
+					{
+						if (uplink.ContainsComponentsLike(msg.Target))
+						{
+							uplink.CastAndSetComponent(null);
+							uplink.CallGenericRelink(child);
+						}
+					}
+				}
+				if (Parent != null)
+				{
+					foreach (var downlink in Parent.downlinks)
+					{
+						if (downlink.ContainsComponentsLike(msg.Target))
+						{
+							downlink.CastAndRemoveComponent(msg.Target);
+							downlink.CallGenericRelink(Parent);
+						}
+					}
+				}
 			}
 		}
 	}

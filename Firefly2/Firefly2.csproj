@@ -71,6 +71,7 @@
     <Compile Include="IAnswersMessage.cs" />
     <Compile Include="Messages\AddedToEntity.cs" />
     <Compile Include="Messages\AfterUpdateMessage.cs" />
+    <Compile Include="Messages\ComponentCollectionChanged.cs" />
     <Compile Include="Messages\GeometryChanged.cs" />
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\NewChild.cs" />

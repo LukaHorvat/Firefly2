@@ -7,10 +7,16 @@ using System.Threading.Tasks;
 
 namespace Firefly2.Facilities
 {
-	public abstract class Uplink
+	public abstract class Link
+	{
+		internal abstract void CallGenericRelink(TreeNodeComponent node);
+		internal abstract bool ContainsComponentsLike(Component comp);
+	}
+
+	public abstract class Uplink : Link
 	{
 		internal abstract void CastAndSetComponent(Component component);
-		internal abstract void CallGenericRelink(TreeNodeComponent node);
+		//internal abstract void CallGenericRelink(TreeNodeComponent node);
 	}
 
 	public class Uplink<T> : Uplink
@@ -27,13 +33,17 @@ namespace Firefly2.Facilities
 		{
 			node.RestoreUplink(this);
 		}
+
+		internal override bool ContainsComponentsLike(Component comp)
+		{
+			return comp.GetType() == typeof(T);
+		}
 	}
 
-	public abstract class Downlink
+	public abstract class Downlink : Link
 	{
 		internal abstract void CastAndAddComponent(Component component);
 		internal abstract void CastAndRemoveComponent(Component component);
-		internal abstract void CallGenericRelink(TreeNodeComponent node);
 		internal abstract void RemoveMatchingComponent(TreeNodeComponent node);
 	}
 
@@ -65,6 +75,11 @@ namespace Firefly2.Facilities
 		internal override void RemoveMatchingComponent(TreeNodeComponent node)
 		{
 			Components.Remove(node.Host.GetComponent<T>());
+		}
+
+		internal override bool ContainsComponentsLike(Component comp)
+		{
+			return comp.GetType() == typeof(T);
 		}
 	}
 }
