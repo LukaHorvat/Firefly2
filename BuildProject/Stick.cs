@@ -20,13 +20,13 @@ namespace BuildProject
 		public Stick(Stage stage, string name)
 		{
 			Name = name;
-			Components.Add(new GeometryComponent());
-			Components.Add(new ShapeColorComponent());
+			AddComponent<GeometryComponent>();
+			AddComponent<ShapeColorComponent>();
 			Components.Add(new TransformComponent(stage.Renderer));
 			Components.Add(new RenderBufferComponent(stage.Renderer));
-			Components.Add(new TreeNodeComponent());
-			Components.Add(new UpdateComponent());
-			Components.Add(new MouseInteractionComponent());
+			AddComponent<TreeNodeComponent>();
+			AddComponent<UpdateComponent>();
+			AddComponent<MouseInteractionComponent>();
 			GetComponent<GeometryComponent>().Polygon.Add(new Vector2d(0, 5));
 			GetComponent<GeometryComponent>().Polygon.Add(new Vector2d(100, 5));
 			GetComponent<GeometryComponent>().Polygon.Add(new Vector2d(100, -5));

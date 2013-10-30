@@ -28,7 +28,10 @@ namespace BuildProject
 			a.Tree.AddChild(b);
 			b.Tree.AddChild(c);
 
-			var link = c.Tree.CreateUplink<UpdateComponent>();
+			var link = stage.TreeNode.CreateDownlink<UpdateComponent>();
+			c.AddComponent<UpdateComponent>();
+			stage.TreeNode.AddChild(a);
+			a.Tree.RemoveChild(b);
 
 			stage.Run();
 

@@ -15,7 +15,7 @@ namespace BuildProject
 
 		public Node()
 		{
-			Components.Add(new TreeNodeComponent());
+			AddComponent<TreeNodeComponent>();
 		}
 	}
 }

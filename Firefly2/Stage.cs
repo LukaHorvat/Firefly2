@@ -18,21 +18,11 @@ namespace Firefly2
 		public GameWindow Window;
 		public Action<Vector2d> temp;
 
-		protected TreeNodeComponent TreeNode
-		{
-			get
-			{
-				return GetComponent<TreeNodeComponent>();
-			}
-		}
+		[Shorthand]
+		public TreeNodeComponent TreeNode { get; set; }
 
-		protected UpdateComponent Update
-		{
-			get
-			{
-				return GetComponent<UpdateComponent>();
-			}
-		}
+		[Shorthand]
+		protected UpdateComponent Update { get; set; }
 
 		public Stage(int width, int height, string title)
 		{
@@ -72,8 +62,8 @@ namespace Firefly2
 				Window.SwapBuffers();
 			};
 
-			Components.Add(new TreeNodeComponent());
-			Components.Add(new UpdateComponent());
+			AddComponent<TreeNodeComponent>();
+			AddComponent<UpdateComponent>();
 
 			Renderer = new Renderer(width, height);
 		}

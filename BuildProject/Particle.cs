@@ -17,12 +17,12 @@ namespace BuildProject
 		public Particle(Stage stage)
 		{
 			var rand = new Random();
-			Components.Add(new GeometryComponent());
-			Components.Add(new ShapeColorComponent());
+			AddComponent<GeometryComponent>();
+			AddComponent<ShapeColorComponent>();
 			Components.Add(transform = new TransformComponent(stage.Renderer));
 			Components.Add(new RenderBufferComponent(stage.Renderer));
-			Components.Add(new TreeNodeComponent());
-			Components.Add(new UpdateComponent());
+			AddComponent<TreeNodeComponent>();
+			AddComponent<UpdateComponent>();
 			GetComponent<GeometryComponent>().Polygon.Add(new Vector2d(rand.Next(-5, 0), rand.Next(-5, 0)));
 			GetComponent<GeometryComponent>().Polygon.Add(new Vector2d(rand.Next(0, 5), rand.Next(-5, 0)));
 			GetComponent<GeometryComponent>().Polygon.Add(new Vector2d(rand.Next(0, 5), rand.Next(0, 5)));

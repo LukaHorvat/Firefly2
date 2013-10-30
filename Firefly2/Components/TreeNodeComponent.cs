@@ -114,6 +114,7 @@ namespace Firefly2.Components
 			{
 				if (args.NewItems != null)
 				{
+					foreach (var downlink in downlinks) downlink.CallGenericRelink(this);
 					foreach (TreeNodeComponent child in args.NewItems)
 					{
 						if (child.Parent != null) throw new Exception("Child already has a parent");
@@ -133,6 +134,11 @@ namespace Firefly2.Components
 						{
 							uplink.CastAndSetComponent(null);
 							RemoveUplink(uplink);
+						}
+						foreach (var downlink in downlinks)
+						{
+							if (child.downlinks.Remove(downlink)) child.RemoveDownlink(downlink);
+							else downlink.RemoveMatchingComponent(child);
 						}
 						child.Parent = null;
 						child.Host.SendMessage(RemovedFromParent.Instance);
@@ -201,6 +207,8 @@ namespace Firefly2.Components
 		{
 			BFS(node =>
 			{
+				if (node.downlinks.Contains(link)) return false;
+
 				var comp = node.Host.GetComponent<T>();
 				if (comp != null)
 				{
@@ -220,7 +228,7 @@ namespace Firefly2.Components
 				{
 					return true;
 				}
-				link.RemoveMatchingComponent(this);
+				link.RemoveMatchingComponent(node);
 				return false;
 			});
 		}

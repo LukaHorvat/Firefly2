@@ -25,7 +25,7 @@ namespace Firefly2
 		public ObservableCollection<Component> Components;
 		private Dictionary<string, Component> componentsByName;
 
-		public static Dictionary<Type, Dictionary<string, Action<Entity, object>>> shorthandMap 
+		public static Dictionary<Type, Dictionary<string, Action<Entity, object>>> shorthandMap
 			= new Dictionary<Type, Dictionary<string, Action<Entity, object>>>();
 
 		public Entity()
@@ -37,13 +37,13 @@ namespace Firefly2
 			if (!shorthandMap.ContainsKey(type))
 			{
 				shorthandMap[type] = new Dictionary<string, Action<Entity, object>>();
-				var shorthands = type.GetProperties()
+				var shorthands = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
 					.Where(field => Attribute.IsDefined(field, typeof(Shorthand)));
 				var helper = typeof(Entity).GetMethod("GenerateFieldSetMethod", BindingFlags.Static | BindingFlags.NonPublic);
 				foreach (var shorthand in shorthands)
 				{
 					var method = helper.MakeGenericMethod(type, shorthand.PropertyType);
-					shorthandMap[type][shorthand.PropertyType.Name] = (Action<Entity, object>)method.Invoke(null, new object[] { shorthand.GetSetMethod() });
+					shorthandMap[type][shorthand.PropertyType.Name] = (Action<Entity, object>)method.Invoke(null, new object[] { shorthand.GetSetMethod(true) });
 				}
 			}
 
@@ -103,6 +103,11 @@ namespace Firefly2
 		public T GetComponent<T>() where T : Component
 		{
 			return this[typeof(T).Name] as T;
+		}
+
+		public void AddComponent<T>() where T : Component, new()
+		{
+			Components.Add(new T());
 		}
 
 		public void SendMessage<T>(T message)
