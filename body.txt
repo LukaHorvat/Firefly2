@@ -27,6 +27,15 @@ Here's a quick example you can paste in your Program.Main that will display a co
 	stage.Run();
 ```
 First we make a new Stage instance. The stage is an entity to which you attach other entities that you want on the screen.
+TreeNode is a shorthand that points to the stage's TreeNodeComponent. Shorthands will be discussed in the next section.
+The TreeNodeComponent is they way you connect entities together in a hierarchical order.
+We supply the AddChild method with a new entity which we construct on the spot adding some components to it.
+The GeometryComponent provides the mesh coordinate data. It doesn't contain color information or texture coordinates so it can be used for purposes other than rendering.
+The ShapeColorComponent adds the color data to those points.
+Next, we add the RenderBufferComponent and the TreeNodeComponent. The render buffer will process the geometry and color data and update the internal buffer that is later rendered.
+We need the tree node so we have an "attachment point" for the stage's tree node.
+
+After the setup is done, we call stage.Run. This blocks further code execution until we close the opened window.
 
 ### Support or Contact
 Having trouble with Firefly2? You can email me at lukahorvat9@gmail.com
