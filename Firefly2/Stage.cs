@@ -22,7 +22,7 @@ namespace Firefly2
 		public TreeNodeComponent TreeNode { get; set; }
 
 		[Shorthand]
-		protected UpdateComponent Update { get; set; }
+		public UpdateComponent Update { get; set; }
 
 		public Stage(int width, int height, string title)
 		{

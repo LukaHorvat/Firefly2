@@ -63,6 +63,7 @@ namespace Firefly2.Components
 			}
 		}
 
+		private RenderBufferComponent uplink;
 		private bool needsUpdate = false;
 		private Dictionary<uint, VertexData> triangulationMap;
 		private bool rendering = false;

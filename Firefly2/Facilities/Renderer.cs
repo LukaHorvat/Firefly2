@@ -13,7 +13,6 @@ namespace Firefly2.Facilities
 	{
 		private Dictionary<string, Layer> layers;
 		private int window;
-		private Matrix4 windowMatrix;
 		private ShaderProgramInfo shaderInfo;
 
 		public int ShaderProgram;

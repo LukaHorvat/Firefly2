@@ -61,13 +61,9 @@ namespace Firefly2
 						var func = component as ITakesMessage<AddedToEntity>;
 						if (func != null) func.TakeMessage(AddedToEntity.Instance);
 
-						Action<Entity, object> field;
-						if (shorthandMap[GetType()].TryGetValue(component.GetType().Name, out field))
-						{
-							field(this, component);
-						}
+						UpdateShorthand(component.GetType().Name, component);
 
-						SendMessage(new ComponentCollectionChanged(component, ComponentCollectionChanged.ChangeType.Add));
+						NotifyComponents(ComponentCollectionChanged.ChangeType.Add, component);
 					}
 				}
 				if (args.OldItems != null)
@@ -76,17 +72,43 @@ namespace Firefly2
 					{
 						componentsByName.Remove(component.Name);
 						component.Host = null;
+						var func = component as ITakesMessage<RemovedFromParent>;
+						if (func != null) func.TakeMessage(RemovedFromParent.Instance);
 
-						Action<Entity, object> field;
-						if (shorthandMap[GetType()].TryGetValue(component.GetType().Name, out field))
-						{
-							field(this, null);
-						}
+						UpdateShorthand(component.GetType().Name, null);
 
-						SendMessage(new ComponentCollectionChanged(component, ComponentCollectionChanged.ChangeType.Remove));
+						NotifyComponents(ComponentCollectionChanged.ChangeType.Remove, component);
 					}
 				}
 			};
+		}
+
+		private void NotifyComponents(ComponentCollectionChanged.ChangeType type, Component component)
+		{
+			var msg = new ComponentCollectionChanged(component, type);
+			var takesMessage = component as ITakesMessage<ComponentCollectionChanged>;
+			for (int i = 0; i < Components.Count; ++i)
+			{
+				if (Components[i] != component)
+				{
+					var listener = Components[i] as ITakesMessage<ComponentCollectionChanged>;
+					if (listener != null) listener.TakeMessage(msg);
+					if (takesMessage != null)
+					{
+						takesMessage.TakeMessage(
+							new ComponentCollectionChanged(Components[i], type));
+					}
+				}
+			}
+		}
+
+		private void UpdateShorthand(string name, object value)
+		{
+			Action<Entity, object> field;
+			if (shorthandMap[GetType()].TryGetValue(name, out field))
+			{
+				field(this, value);
+			}
 		}
 
 		public Component this[string name]

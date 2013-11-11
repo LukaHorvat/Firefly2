@@ -97,30 +97,46 @@ namespace Firefly2.Components
 		public ObservableCollection<TreeNodeComponent> Children;
 		public TreeNodeComponent Parent;
 
-		private LinkedList<Uplink> uplinks;
-		private LinkedList<Downlink> downlinks;
+		private LinkedList<WeakReference<Uplink>> uplinks;
+		private LinkedList<WeakReference<Downlink>> downlinks;
 
 		public TreeNodeComponent() : this(null) { }
 
 		public TreeNodeComponent(TreeNodeComponent parent)
 			: base()
 		{
-			uplinks = new LinkedList<Uplink>();
-			downlinks = new LinkedList<Downlink>();
+			uplinks = new LinkedList<WeakReference<Uplink>>();
+			downlinks = new LinkedList<WeakReference<Downlink>>();
 			Parent = parent;
 			Children = new ObservableCollection<TreeNodeComponent>();
 
 			Children.CollectionChanged += delegate(object target, NotifyCollectionChangedEventArgs args)
 			{
+				var downlinkValues = new List<Downlink>();
+				downlinks.ToList().ForEach(refer =>
+				{
+					var downlink = refer.GetTarget();
+					if (downlink != null) downlinkValues.Add(downlink);
+					else downlinks.Remove(refer);
+				});
+				uplinks.RemoveWhere(refer => !refer.IsAlive());
+
 				if (args.NewItems != null)
 				{
-					foreach (var downlink in downlinks) downlink.CallGenericRelink(this);
+					foreach (var downlink in downlinkValues)
+					{
+						downlink.CallGenericRelink(this);
+					}
 					foreach (TreeNodeComponent child in args.NewItems)
 					{
 						if (child.Parent != null) throw new Exception("Child already has a parent");
 						child.Parent = this;
-						//This will call the RestoreUplink method AND supply the generic parameter
-						foreach (var uplink in child.uplinks) uplink.CallGenericRelink(child);
+
+						foreach (var refer in child.uplinks)
+						{
+							Uplink uplink = refer.GetTarget();
+							if (uplink != null) uplink.CallGenericRelink(child);
+						}
 
 						child.Host.SendMessage(NewParent.Instance);
 						Host.SendMessage(new NewChild(child));
@@ -130,14 +146,16 @@ namespace Firefly2.Components
 				{
 					foreach (TreeNodeComponent child in args.OldItems)
 					{
-						foreach (var uplink in child.uplinks)
+						foreach (var refer in child.uplinks)
 						{
+							Uplink uplink = refer.GetTarget();
+							if (uplink == null) continue;
 							uplink.CastAndSetComponent(null);
 							RemoveUplink(uplink);
 						}
-						foreach (var downlink in downlinks)
+						foreach (var downlink in downlinkValues)
 						{
-							if (child.downlinks.Remove(downlink)) child.RemoveDownlink(downlink);
+							if (child.downlinks.RemoveWhere( refer => refer.GetTarget() == downlink)) child.RemoveDownlink(downlink);
 							else downlink.RemoveMatchingComponent(child);
 						}
 						child.Parent = null;
@@ -161,7 +179,7 @@ namespace Firefly2.Components
 			where T : Component
 		{
 			var link = new Uplink<T>();
-			uplinks.AddLast(link);
+			uplinks.AddLast(new WeakReference<Uplink>(link));
 			RestoreUplink(link);
 			return link;
 		}
@@ -178,7 +196,7 @@ namespace Firefly2.Components
 					link.CastAndSetComponent(comp);
 					break;
 				}
-				current.uplinks.AddLast(link);
+				current.uplinks.AddLast(new WeakReference<Uplink>(link));
 				current = current.Parent;
 			}
 		}
@@ -186,7 +204,7 @@ namespace Firefly2.Components
 		public void RemoveUplink(Uplink link)
 		{
 			var current = this;
-			while (current.uplinks.Remove(link))
+			while (current.uplinks.RemoveWhere(refer => refer.GetTarget() == link))
 			{
 				current = current.Parent;
 				if (current == null) break;
@@ -197,7 +215,7 @@ namespace Firefly2.Components
 			where T : Component
 		{
 			var link = new Downlink<T>();
-			downlinks.AddLast(link);
+			downlinks.AddLast(new WeakReference<Downlink>(link));
 			RestoreDownlink(link);
 			return link;
 		}
@@ -207,7 +225,7 @@ namespace Firefly2.Components
 		{
 			BFS(node =>
 			{
-				if (node.downlinks.Contains(link)) return false;
+				if (node.downlinks.Any(refer => refer.GetTarget() == link)) return false;
 
 				var comp = node.Host.GetComponent<T>();
 				if (comp != null)
@@ -215,7 +233,7 @@ namespace Firefly2.Components
 					link.CastAndAddComponent(comp);
 					return false;
 				}
-				node.downlinks.AddLast(link);
+				node.downlinks.AddLast(new WeakReference<Downlink>(link));
 				return true;
 			});
 		}
@@ -224,7 +242,7 @@ namespace Firefly2.Components
 		{
 			BFS(node =>
 			{
-				if (downlinks.Remove(link))
+				if (downlinks.RemoveWhere(refer => refer.GetTarget() == link))
 				{
 					return true;
 				}
@@ -310,15 +328,22 @@ namespace Firefly2.Components
 
 		public void TakeMessage(ComponentCollectionChanged msg)
 		{
+			uplinks.RemoveWhere(refer => !refer.IsAlive());
+			downlinks.RemoveWhere(refer => !refer.IsAlive());
+
 			if (msg.Type == ComponentCollectionChanged.ChangeType.Add)
 			{
-				var ulinks = uplinks.Where(link => link.ContainsComponentsLike(msg.Target));
+				var ulinks = uplinks
+					.Select(refer => refer.GetTarget())
+					.Where(link => link != null && link.ContainsComponentsLike(msg.Target));
 				if (ulinks.Count() > 0)
 				{
 					if (Parent != null) Parent.RemoveUplink(ulinks.First());
 					ulinks.First().CastAndSetComponent(msg.Target);
 				}
-				var dlinks = downlinks.Where(link => link.ContainsComponentsLike(msg.Target));
+				var dlinks = downlinks
+					.Select(refer => refer.GetTarget())
+					.Where(link => link != null && link.ContainsComponentsLike(msg.Target));
 				if (dlinks.Count() > 0)
 				{
 					foreach (var child in Children) child.RemoveDownlink(dlinks.First());
@@ -329,8 +354,10 @@ namespace Firefly2.Components
 			{
 				foreach (var child in Children)
 				{
-					foreach (var uplink in child.uplinks)
+					foreach (var refer in child.uplinks)
 					{
+						Uplink uplink = refer.GetTarget();
+						if (uplink == null) continue;
 						if (uplink.ContainsComponentsLike(msg.Target))
 						{
 							uplink.CastAndSetComponent(null);
@@ -340,8 +367,10 @@ namespace Firefly2.Components
 				}
 				if (Parent != null)
 				{
-					foreach (var downlink in Parent.downlinks)
+					foreach (var refer in Parent.downlinks)
 					{
+						Downlink downlink = refer.GetTarget();
+						if (downlink == null) continue;
 						if (downlink.ContainsComponentsLike(msg.Target))
 						{
 							downlink.CastAndRemoveComponent(msg.Target);

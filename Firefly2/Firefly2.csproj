@@ -90,6 +90,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\BinaryTree.cs" />
     <Compile Include="Utility\Debug.cs" />
+    <Compile Include="Utility\Extensions.cs" />
     <Compile Include="Utility\Geometry.cs" />
     <Compile Include="Utility\PriorityQueue.cs" />
     <Compile Include="Utility\Triangulation.cs" />

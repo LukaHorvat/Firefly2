@@ -33,6 +33,11 @@ namespace BuildProject
 			stage.TreeNode.AddChild(a);
 			a.Tree.RemoveChild(b);
 
+			link = null;
+			GC.Collect();
+
+			link = stage.TreeNode.CreateDownlink<UpdateComponent>();
+
 			stage.Run();
 
 			Console.ReadKey();
