@@ -1,0 +1,6 @@
+Firefly2/bin/
+Firefly2/obj/
+BuildProject/bin/
+BuildProject/obj/
+*.psess
+*.vspx
