@@ -12,7 +12,7 @@ namespace Firefly2.Components
 	/// <summary>
 	/// Class that defiines the vertex colors for the geometry component
 	/// </summary>
-	public class ShapeColorComponent : Component
+	public class ShapeColorComponent : Component, IEnumerable<Vector4>
 	{
 		public ObservableCollection<Vector4> Colors;
 
@@ -21,8 +21,23 @@ namespace Firefly2.Components
 			Colors = new ObservableCollection<Vector4>();
 			Colors.CollectionChanged += delegate
 			{
-				Host.SendMessage(ShapeColorChanged.Instance);
+				if (Host != null) Host.SendMessage(ShapeColorChanged.Instance);
 			};
+		}
+
+		public void Add(Vector4 color)
+		{
+			Colors.Add(color);
+		}
+
+		public IEnumerator<Vector4> GetEnumerator()
+		{
+			return Colors.GetEnumerator();
+		}
+
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return Colors.GetEnumerator();
 		}
 	}
 }

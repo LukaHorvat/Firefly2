@@ -21,7 +21,8 @@ namespace Firefly2.Components
 													ITakesMessage<NewParent>,
 													ITakesMessage<StartRendering>,
 													ITakesMessage<StopRendering>,
-													ITakesMessage<AddedToEntity>
+													ITakesMessage<AddedToEntity>,
+													ITakesMessage<ComponentCollectionChanged>
 	{
 		private class VertexData
 		{
@@ -208,6 +209,14 @@ namespace Firefly2.Components
 		public void TakeMessage(NewParent msg)
 		{
 			if (tree.Parent.Host is Stage) Host.SendMessage(StartRendering.Instance);
+		}
+
+		public void TakeMessage(ComponentCollectionChanged msg)
+		{
+			if (msg.Target is GeometryComponent || msg.Target is ShapeColorComponent || msg.Target is TextureComponent)
+			{
+				needsUpdate = true;
+			}
 		}
 	}
 }

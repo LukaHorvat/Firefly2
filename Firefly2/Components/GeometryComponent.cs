@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Firefly2.Components
 {
-	public class GeometryComponent : Component
+	public class GeometryComponent : Component, IEnumerable<Vector2d>
 	{
 		public ObservableCollection<Vector2d> Polygon;
 
@@ -18,7 +18,7 @@ namespace Firefly2.Components
 			Polygon = new ObservableCollection<Vector2d>();
 			Polygon.CollectionChanged += delegate
 			{
-				Host.SendMessage(GeometryChanged.Instance);
+				if (Host != null) Host.SendMessage(GeometryChanged.Instance);
 			};
 		}
 
@@ -57,7 +57,22 @@ namespace Firefly2.Components
 				}
 			}
 			if (linesToTheRight % 2 == 1) return true;
-			else return false; 
+			else return false;
+		}
+
+		public void Add(Vector2d vector)
+		{
+			Polygon.Add(vector);
+		}
+
+		public IEnumerator<Vector2d> GetEnumerator()
+		{
+			return Polygon.GetEnumerator();
+		}
+
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return Polygon.GetEnumerator();
 		}
 	}
 }

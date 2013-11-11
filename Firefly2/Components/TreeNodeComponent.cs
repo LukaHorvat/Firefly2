@@ -155,7 +155,7 @@ namespace Firefly2.Components
 						}
 						foreach (var downlink in downlinkValues)
 						{
-							if (child.downlinks.RemoveWhere( refer => refer.GetTarget() == downlink)) child.RemoveDownlink(downlink);
+							if (child.downlinks.RemoveWhere(refer => refer.GetTarget() == downlink)) child.RemoveDownlink(downlink);
 							else downlink.RemoveMatchingComponent(child);
 						}
 						child.Parent = null;
@@ -167,6 +167,10 @@ namespace Firefly2.Components
 
 		public void AddChild(Entity entity)
 		{
+			if (entity.GetComponent<TreeNodeComponent>() == null)
+			{
+				throw new Exception("The entity you are adding must have a TreeNodeComponent attached");
+			}
 			Children.Add(entity.GetComponent<TreeNodeComponent>());
 		}
 
