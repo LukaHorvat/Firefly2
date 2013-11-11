@@ -1,0 +1,32 @@
+### Example usage
+Here's a quick example you can paste in your Program.Main that will display a colored square on your screen.
+
+```csharp
+	var stage = new Stage(800, 500, "Hello World");
+
+	stage.TreeNode.AddChild(new Entity
+	{
+		new GeometryComponent
+		{
+			new Vector2d(0, 0),
+			new Vector2d(100, 0),
+			new Vector2d(100, 100),
+			new Vector2d(0, 100)
+		},
+		new ShapeColorComponent
+		{
+			new Vector4(1, 0, 0, 1),
+			new Vector4(0, 1, 0, 1),
+			new Vector4(0, 0, 1, 1),
+			new Vector4(1, 1, 0, 1)
+		},
+		new RenderBufferComponent(stage.Renderer),
+		new TreeNodeComponent()
+	});
+
+	stage.Run();
+```
+First we make a new Stage instance. The stage is an entity to which you attach other entities that you want on the screen.
+
+### Support or Contact
+Having trouble with Firefly2? You can email me at lukahorvat9@gmail.com
