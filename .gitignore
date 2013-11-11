@@ -1,4 +1,7 @@
 Firefly2/obj/
+Firefly2/bin/*/*.pdb
+Firefly2/bin/*/*.xml
+Firefly2/bin/Release/
 BuildProject/bin/
 BuildProject/obj/
 *.psess
