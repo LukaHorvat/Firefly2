@@ -84,6 +84,148 @@ returns the last set value.
 There are no restrictions to the accessibility modifier.</p>
 
 <h3>
+<a name="parent-child-system" class="anchor" href="#parent-child-system"><span class="octicon octicon-link"></span></a>Parent-child system</h3>
+
+<p>Now lets look at a slightly more complicated example. We'll take our entity and put it in a MakeRectangle function. Also, we'll modify it slightly.</p>
+
+<div class="highlight highlight-csharp"><pre><span class="k">static</span> <span class="n">Entity</span> <span class="nf">MakeRectangle</span><span class="p">(</span><span class="n">Renderer</span> <span class="n">renderer</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">Entity</span>
+    <span class="p">{</span>
+        <span class="k">new</span> <span class="n">GeometryComponent</span>
+        <span class="p">{</span>
+            <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">200</span><span class="p">,</span> <span class="m">0</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">200</span><span class="p">,</span> <span class="m">100</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">100</span><span class="p">)</span>
+        <span class="p">},</span>
+        <span class="k">new</span> <span class="n">ShapeColorComponent</span>
+        <span class="p">{</span>
+            <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span>
+        <span class="p">},</span>
+        <span class="k">new</span> <span class="nf">RenderBufferComponent</span><span class="p">(</span><span class="n">renderer</span><span class="p">),</span>
+        <span class="k">new</span> <span class="nf">TreeNodeComponent</span><span class="p">(),</span>
+        <span class="k">new</span> <span class="nf">TransformComponent</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+    <span class="p">};</span>
+</pre></div>
+
+<p>We elongated the rectangle, and we added a new component. The TransformComponent, like it's name says, handles transformations. That's stuff like X, Y, Rotation and Scale.
+So let's make a few rectangles and link them together.</p>
+
+<div class="highlight highlight-csharp"><pre><span class="kt">var</span> <span class="n">stage</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Stage</span><span class="p">(</span><span class="m">800</span><span class="p">,</span> <span class="m">500</span><span class="p">,</span> <span class="s">"Hello World"</span><span class="p">);</span>
+
+<span class="kt">var</span> <span class="n">a</span> <span class="p">=</span> <span class="n">MakeRectangle</span><span class="p">(</span><span class="n">stage</span><span class="p">.</span><span class="n">Renderer</span><span class="p">);</span>
+<span class="kt">var</span> <span class="n">b</span> <span class="p">=</span> <span class="n">MakeRectangle</span><span class="p">(</span><span class="n">stage</span><span class="p">.</span><span class="n">Renderer</span><span class="p">);</span>
+<span class="kt">var</span> <span class="n">c</span> <span class="p">=</span> <span class="n">MakeRectangle</span><span class="p">(</span><span class="n">stage</span><span class="p">.</span><span class="n">Renderer</span><span class="p">);</span>
+<span class="n">a</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">TreeNodeComponent</span><span class="p">&gt;().</span><span class="n">AddChild</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+<span class="n">b</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">TreeNodeComponent</span><span class="p">&gt;().</span><span class="n">AddChild</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
+<span class="n">b</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">TransformComponent</span><span class="p">&gt;().</span><span class="n">X</span> <span class="p">=</span> <span class="m">200</span><span class="p">;</span>
+<span class="n">c</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">TransformComponent</span><span class="p">&gt;().</span><span class="n">X</span> <span class="p">=</span> <span class="m">200</span><span class="p">;</span>
+
+<span class="n">a</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">TransformComponent</span><span class="p">&gt;().</span><span class="n">ScaleX</span> <span class="p">=</span> <span class="m">0.5</span><span class="p">;</span>
+<span class="n">a</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">TransformComponent</span><span class="p">&gt;().</span><span class="n">ScaleY</span> <span class="p">=</span> <span class="m">0.5</span><span class="p">;</span>
+
+<span class="n">stage</span><span class="p">.</span><span class="n">TreeNode</span><span class="p">.</span><span class="n">AddChild</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+
+<span class="n">stage</span><span class="p">.</span><span class="n">Run</span><span class="p">();</span>
+</pre></div>
+
+<p>So let's see here. We make 3 rectangles, link them a -&gt; b -&gt; c and then modify some of their properties. We put b and c at X = 200. We also shrink a by half.
+Then we add a to stage.
+What we see when we run the program are all three rectangles because you don't need to add each of them separately to the stage. You need to add the root of the tree you want displayed.
+Secondly, the first rectangle isn't the only one scaled. They are all the same size. Why? Because changing the transformation of the parent entity changes the coordinate system of the
+child entity. This also means that b and c are not in the same spot because b is shifter 200 to the right RELATIVE TO a and c is shifter 200 to the right RELATIVE TO b.
+In fact, they are only shifted by 100 each since the whole coordinate system is scaled to one half.</p>
+
+<p>If we were to rotate a, the whole stick of rectangles would rotate.</p>
+
+<p>One extra thing to note here is that we need to use GetComponent instead of just TreeNode since we didn't (and can't) define a shorthand.
+This is because we made a new entity on the spot instead of making a new class that inherits from entity. Since writing GetComponent&lt;...&gt; gets real boring
+real fast, shorthands were introduced.</p>
+
+<h3>
+<a name="mouse-interaction" class="anchor" href="#mouse-interaction"><span class="octicon octicon-link"></span></a>Mouse interaction</h3>
+
+<p>Next, let's take a look at mouse interaction. The idea is simple. We want to know if an object if being hovered over with the mouse. If it is, make it grow slightly.
+This is how it should look.</p>
+
+<div class="highlight highlight-csharp"><pre><span class="k">static</span> <span class="n">Entity</span> <span class="nf">MakeRectangle</span><span class="p">(</span><span class="n">Renderer</span> <span class="n">renderer</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">Entity</span>
+    <span class="p">{</span>
+        <span class="k">new</span> <span class="n">GeometryComponent</span>
+        <span class="p">{</span>
+            <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">200</span><span class="p">,</span> <span class="m">0</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">200</span><span class="p">,</span> <span class="m">100</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">100</span><span class="p">)</span>
+        <span class="p">},</span>
+        <span class="k">new</span> <span class="n">ShapeColorComponent</span>
+        <span class="p">{</span>
+            <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span>
+        <span class="p">},</span>
+        <span class="k">new</span> <span class="nf">RenderBufferComponent</span><span class="p">(</span><span class="n">renderer</span><span class="p">),</span>
+        <span class="k">new</span> <span class="nf">TreeNodeComponent</span><span class="p">(),</span>
+        <span class="k">new</span> <span class="nf">TransformComponent</span><span class="p">(</span><span class="n">renderer</span><span class="p">),</span>
+        <span class="k">new</span> <span class="nf">MouseInteractionComponent</span><span class="p">()</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+
+<div class="highlight highlight-csharp"><pre><span class="kt">var</span> <span class="n">stage</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Stage</span><span class="p">(</span><span class="m">800</span><span class="p">,</span> <span class="m">500</span><span class="p">,</span> <span class="s">"Hello World"</span><span class="p">);</span>
+
+<span class="kt">var</span> <span class="n">a</span> <span class="p">=</span> <span class="n">MakeRectangle</span><span class="p">(</span><span class="n">stage</span><span class="p">.</span><span class="n">Renderer</span><span class="p">);</span>
+<span class="kt">var</span> <span class="n">b</span> <span class="p">=</span> <span class="n">MakeRectangle</span><span class="p">(</span><span class="n">stage</span><span class="p">.</span><span class="n">Renderer</span><span class="p">);</span>
+<span class="kt">var</span> <span class="n">c</span> <span class="p">=</span> <span class="n">MakeRectangle</span><span class="p">(</span><span class="n">stage</span><span class="p">.</span><span class="n">Renderer</span><span class="p">);</span>
+<span class="n">b</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">TransformComponent</span><span class="p">&gt;().</span><span class="n">X</span> <span class="p">=</span> <span class="m">100</span><span class="p">;</span>
+<span class="n">c</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">TransformComponent</span><span class="p">&gt;().</span><span class="n">X</span> <span class="p">=</span> <span class="m">200</span><span class="p">;</span>
+
+<span class="n">stage</span><span class="p">.</span><span class="n">Update</span><span class="p">.</span><span class="n">Update</span> <span class="p">+=</span> <span class="k">delegate</span>
+<span class="p">{</span>
+    <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Entity</span><span class="p">&gt;()</span> <span class="p">{</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="p">}.</span><span class="n">ForEach</span><span class="p">(</span><span class="n">ent</span> <span class="p">=&gt;</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">intersects</span> <span class="p">=</span> <span class="n">ent</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">MouseInteractionComponent</span><span class="p">&gt;()</span>
+            <span class="p">.</span><span class="n">AnswerMessage</span><span class="p">(</span>
+            <span class="k">new</span> <span class="nf">MouseIntersectQuery</span><span class="p">(</span>
+                <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="n">stage</span><span class="p">.</span><span class="n">Window</span><span class="p">.</span><span class="n">Mouse</span><span class="p">.</span><span class="n">X</span> <span class="p">-</span> <span class="m">400</span><span class="p">,</span> <span class="n">stage</span><span class="p">.</span><span class="n">Window</span><span class="p">.</span><span class="n">Mouse</span><span class="p">.</span><span class="n">Y</span> <span class="p">-</span> <span class="m">250</span><span class="p">)));</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">intersects</span> <span class="p">==</span> <span class="n">MouseIntersectAnswer</span><span class="p">.</span><span class="n">Intersects</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">ent</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">TransformComponent</span><span class="p">&gt;().</span><span class="n">ScaleX</span> <span class="p">=</span> <span class="m">0.6</span><span class="p">;</span>
+            <span class="n">ent</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">TransformComponent</span><span class="p">&gt;().</span><span class="n">ScaleY</span> <span class="p">=</span> <span class="m">0.6</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="n">ent</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">TransformComponent</span><span class="p">&gt;().</span><span class="n">ScaleX</span> <span class="p">=</span> <span class="m">0.5</span><span class="p">;</span>
+            <span class="n">ent</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">TransformComponent</span><span class="p">&gt;().</span><span class="n">ScaleY</span> <span class="p">=</span> <span class="m">0.5</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="n">stage</span><span class="p">.</span><span class="n">TreeNode</span><span class="p">.</span><span class="n">AddChild</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<span class="n">stage</span><span class="p">.</span><span class="n">TreeNode</span><span class="p">.</span><span class="n">AddChild</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+<span class="n">stage</span><span class="p">.</span><span class="n">TreeNode</span><span class="p">.</span><span class="n">AddChild</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
+
+<span class="n">stage</span><span class="p">.</span><span class="n">Run</span><span class="p">();</span>
+</pre></div>
+
+<p>Ok. So there are a lot of interesting things going on here.
+Firstly, let's look at our MakeRectangle function. It adds a MouseInteractionComponent to our entities.
+The setup is similar to the last section except this time the entities aren't linked and they are each added separately to the stage.
+Then, we hook onto the stage's update event. Stage has an Update shorthand that points to it's UpdateComponent. That component has an Update event
+and an AfterUpdate event that you can add your listeners too.
+On each update, for each rectangle we check if it intersects the coordinates of the mouse.</p>
+
+<p>This is not a finished feature. The final version will not require so much under-the-hood work.</p>
+
+<p>If the mouse intersects the object, we scale it. If it doesn't, we keep the scale at 0.5.</p>
+
+<h3>
 <a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
 
 <p>Having trouble with Firefly2? You can email me at <a href="mailto:lukahorvat9@gmail.com">lukahorvat9@gmail.com</a></p>
