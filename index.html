@@ -33,32 +33,41 @@
 
 <p>Here's a quick example you can paste in your Program.Main that will display a colored square on your screen.</p>
 
-<div class="highlight highlight-csharp"><pre>            <span class="kt">var</span> <span class="n">stage</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Stage</span><span class="p">(</span><span class="m">800</span><span class="p">,</span> <span class="m">500</span><span class="p">,</span> <span class="s">"Hello World"</span><span class="p">);</span>
+<div class="highlight highlight-csharp"><pre>    <span class="kt">var</span> <span class="n">stage</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Stage</span><span class="p">(</span><span class="m">800</span><span class="p">,</span> <span class="m">500</span><span class="p">,</span> <span class="s">"Hello World"</span><span class="p">);</span>
 
-            <span class="n">stage</span><span class="p">.</span><span class="n">TreeNode</span><span class="p">.</span><span class="n">AddChild</span><span class="p">(</span><span class="k">new</span> <span class="n">Entity</span>
-            <span class="p">{</span>
-                <span class="k">new</span> <span class="n">GeometryComponent</span>
-                <span class="p">{</span>
-                    <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">),</span>
-                    <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">100</span><span class="p">,</span> <span class="m">0</span><span class="p">),</span>
-                    <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">100</span><span class="p">,</span> <span class="m">100</span><span class="p">),</span>
-                    <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">100</span><span class="p">)</span>
-                <span class="p">},</span>
-                <span class="k">new</span> <span class="n">ShapeColorComponent</span>
-                <span class="p">{</span>
-                    <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
-                    <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
-                    <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
-                    <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span>
-                <span class="p">},</span>
-                <span class="k">new</span> <span class="nf">RenderBufferComponent</span><span class="p">(</span><span class="n">stage</span><span class="p">.</span><span class="n">Renderer</span><span class="p">),</span>
-                <span class="k">new</span> <span class="nf">TreeNodeComponent</span><span class="p">()</span>
-            <span class="p">});</span>
+    <span class="n">stage</span><span class="p">.</span><span class="n">TreeNode</span><span class="p">.</span><span class="n">AddChild</span><span class="p">(</span><span class="k">new</span> <span class="n">Entity</span>
+    <span class="p">{</span>
+        <span class="k">new</span> <span class="n">GeometryComponent</span>
+        <span class="p">{</span>
+            <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">100</span><span class="p">,</span> <span class="m">0</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">100</span><span class="p">,</span> <span class="m">100</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector2d</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">100</span><span class="p">)</span>
+        <span class="p">},</span>
+        <span class="k">new</span> <span class="n">ShapeColorComponent</span>
+        <span class="p">{</span>
+            <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nf">Vector4</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span>
+        <span class="p">},</span>
+        <span class="k">new</span> <span class="nf">RenderBufferComponent</span><span class="p">(</span><span class="n">stage</span><span class="p">.</span><span class="n">Renderer</span><span class="p">),</span>
+        <span class="k">new</span> <span class="nf">TreeNodeComponent</span><span class="p">()</span>
+    <span class="p">});</span>
 
-            <span class="n">stage</span><span class="p">.</span><span class="n">Run</span><span class="p">();</span>
+    <span class="n">stage</span><span class="p">.</span><span class="n">Run</span><span class="p">();</span>
 </pre></div>
 
-<p>First we make a new Stage instance. The stage is an entity to which you attach other entities that you want on the screen.</p>
+<p>First we make a new Stage instance. The stage is an entity to which you attach other entities that you want on the screen.
+TreeNode is a shorthand that points to the stage's TreeNodeComponent. Shorthands will be discussed in the next section.
+The TreeNodeComponent is they way you connect entities together in a hierarchical order.
+We supply the AddChild method with a new entity which we construct on the spot adding some components to it.
+The GeometryComponent provides the mesh coordinate data. It doesn't contain color information or texture coordinates so it can be used for purposes other than rendering.
+The ShapeColorComponent adds the color data to those points.
+Next, we add the RenderBufferComponent and the TreeNodeComponent. The render buffer will process the geometry and color data and update the internal buffer that is later rendered.
+We need the tree node so we have an "attachment point" for the stage's tree node.</p>
+
+<p>After the setup is done, we call stage.Run. This blocks further code execution until we close the opened window.</p>
 
 <h3>
 <a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
