@@ -25,8 +25,8 @@ namespace BuildProject
 				{
 					new Vector2d(0, 0),
 					new Vector2d(100, 0),
-					new Vector2d(100, 10),
-					new Vector2d(0, 10)
+					new Vector2d(100, 100),
+					new Vector2d(0, 100)
 				},
 				new ShapeColorComponent
 				{

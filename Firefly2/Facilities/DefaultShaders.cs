@@ -9,7 +9,7 @@ namespace Firefly2.Facilities
 	public class DefaultShaders
 	{
 		public static string VertexShaderSource = @"
-#version 130
+#version 140
 
 uniform samplerBuffer buffer;
 uniform mat4 camera;
@@ -63,7 +63,7 @@ void main()
 }
 ";
 		public static string FragmentShaderSource = @"
-#version 130
+#version 140
 
 in vec4 fragment_color;
 in vec2 fragment_texcoords;
