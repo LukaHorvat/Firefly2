@@ -22,8 +22,8 @@ namespace BuildProject
 			Name = name;
 			AddComponent<GeometryComponent>();
 			AddComponent<ShapeColorComponent>();
-			Components.Add(new TransformComponent(stage.Renderer));
-			Components.Add(new RenderBufferComponent(stage.Renderer));
+			Add(new TransformComponent(stage.Renderer));
+			Add(new RenderBufferComponent(stage.Renderer));
 			AddComponent<TreeNodeComponent>();
 			AddComponent<UpdateComponent>();
 			AddComponent<MouseInteractionComponent>();

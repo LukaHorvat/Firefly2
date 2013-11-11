@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Firefly2
 {
-	public class Entity
+	public class Entity : IEnumerable<Component>
 	{
 		/// <summary>
 		/// Attribute that marks a property as a shorthand to a component. Can only be added to
@@ -22,7 +22,7 @@ namespace Firefly2
 		{
 		}
 
-		public ObservableCollection<Component> Components;
+		private ObservableCollection<Component> Components;
 		private Dictionary<string, Component> componentsByName;
 
 		public static Dictionary<Type, Dictionary<string, Action<Entity, object>>> shorthandMap
@@ -132,6 +132,30 @@ namespace Firefly2
 			Components.Add(new T());
 		}
 
+		/// <summary>
+		/// Same as AddComponent. This method enables the use of collection initializers for entities.
+		/// </summary>
+		/// <param name="component"></param>
+		public void Add(Component component)
+		{
+			Components.Add(component);
+		}
+
+		public void AddComponent(Component component)
+		{
+			Components.Add(component);
+		}
+
+		public void RemoveComponent(Component component)
+		{
+			Components.Remove(component);
+		}
+
+		public void RemoveComponent<T>() where T : Component
+		{
+			Components.RemoveWhere(c => c is T);
+		}
+
 		public void SendMessage<T>(T message)
 		{
 			for (int i = 0; i < Components.Count; ++i)
@@ -146,6 +170,16 @@ namespace Firefly2
 			where TEntity : Entity
 		{
 			return (e, p) => ((Action<TEntity, TComponent>)Delegate.CreateDelegate(typeof(Action<TEntity, TComponent>), method))((TEntity)e, (TComponent)p);
+		}
+
+		public IEnumerator<Component> GetEnumerator()
+		{
+			return Components.GetEnumerator();
+		}
+
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return Components.GetEnumerator();
 		}
 	}
 }

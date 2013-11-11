@@ -19,8 +19,8 @@ namespace BuildProject
 			var rand = new Random();
 			AddComponent<GeometryComponent>();
 			AddComponent<ShapeColorComponent>();
-			Components.Add(transform = new TransformComponent(stage.Renderer));
-			Components.Add(new RenderBufferComponent(stage.Renderer));
+			Add(transform = new TransformComponent(stage.Renderer));
+			Add(new RenderBufferComponent(stage.Renderer));
 			AddComponent<TreeNodeComponent>();
 			AddComponent<UpdateComponent>();
 			GetComponent<GeometryComponent>().Polygon.Add(new Vector2d(rand.Next(-5, 0), rand.Next(-5, 0)));

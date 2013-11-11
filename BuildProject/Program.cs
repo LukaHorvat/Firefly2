@@ -18,29 +18,9 @@ namespace BuildProject
 	{
 		static void Main(string[] args)
 		{
-			var rand = new Random();
-
-			var stage = new Stage(800, 500, "Test");
-			var a = new Node();
-			var b = new Node();
-			var c = new Node();
-
-			a.Tree.AddChild(b);
-			b.Tree.AddChild(c);
-
-			var link = stage.TreeNode.CreateDownlink<UpdateComponent>();
-			c.AddComponent<UpdateComponent>();
-			stage.TreeNode.AddChild(a);
-			a.Tree.RemoveChild(b);
-
-			link = null;
-			GC.Collect();
-
-			link = stage.TreeNode.CreateDownlink<UpdateComponent>();
+			var stage = new Stage(800, 500, "Hello World");
 
 			stage.Run();
-
-			Console.ReadKey();
 		}
 	}
 }
