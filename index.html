@@ -70,6 +70,20 @@ We need the tree node so we have an "attachment point" for the stage's tree node
 <p>After the setup is done, we call stage.Run. This blocks further code execution until we close the opened window.</p>
 
 <h3>
+<a name="shorthands" class="anchor" href="#shorthands"><span class="octicon octicon-link"></span></a>Shorthands</h3>
+
+<p>Shorthands are a handy way to quickly access components in an entity. When making a new entity subclass, you can use shorthands like this</p>
+
+<div class="highlight highlight-csharp"><pre><span class="na">    [Shorthand]</span>
+    <span class="k">public</span> <span class="n">TransformComponent</span> <span class="n">Transform</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</pre></div>
+
+<p>The property will magically always have the value of the current TransformComponent attached to the entity that has it.
+They they have some restrictions. You can only use them on entities and you can only use them with automatic properties. They will work with normal properties as long as the getter
+returns the last set value.
+There are no restrictions to the accessibility modifier.</p>
+
+<h3>
 <a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
 
 <p>Having trouble with Firefly2? You can email me at <a href="mailto:lukahorvat9@gmail.com">lukahorvat9@gmail.com</a></p>
