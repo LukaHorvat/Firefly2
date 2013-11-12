@@ -20,6 +20,7 @@ namespace Firefly2.Facilities
 
 		public Renderer(int width, int height)
 		{
+			//TODO: Implement custom shaders and cross-renderer layers
 			layers = new Dictionary<string, Layer>();
 
 			string debug;

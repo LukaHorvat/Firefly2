@@ -15,6 +15,13 @@ namespace Firefly2.Components
 							IAnswersMessage<MouseIntersectQuery, MouseIntersectAnswer>
 	{
 		public MutableVector2 Mouse;
+		public bool IntersectsMouse
+		{
+			get
+			{
+				return AnswerMessage(MouseIntersectQuery.Instance) == MouseIntersectAnswer.Intersects;
+			}
+		}
 
 		public MouseInteractionComponent(MutableVector2 mouse)
 		{

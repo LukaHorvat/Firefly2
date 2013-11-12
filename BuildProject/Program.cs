@@ -25,11 +25,10 @@ namespace BuildProject
 			{
 				new TransformComponent(stage.Renderer),
 				new TreeNodeComponent(),
-				new RenderBufferComponent(stage.Renderer)
+				new RenderBufferComponent(stage.Renderer),
+				new CameraComponent()
 			};
 			stage.TreeNode.AddChild(world);
-
-			var camera = new Camera(world);
 
 			var a = MakeRectangle(stage.Renderer, stage.GetMouse());
 			var b = MakeRectangle(stage.Renderer, stage.GetMouse());
@@ -41,10 +40,8 @@ namespace BuildProject
 			{
 				new List<Entity>() { a, b, c }.ForEach(ent =>
 				{
-					var intersects = ent.GetComponent<MouseInteractionComponent>()
-						.AnswerMessage(
-						MouseIntersectQuery.Instance);
-					if (intersects == MouseIntersectAnswer.Intersects)
+					var intersects = ent.GetComponent<MouseInteractionComponent>().IntersectsMouse;
+					if (intersects)
 					{
 						ent.GetComponent<TransformComponent>().ScaleX = 0.6;
 						ent.GetComponent<TransformComponent>().ScaleY = 0.6;
@@ -57,7 +54,7 @@ namespace BuildProject
 				});
 			};
 
-			camera.LookAt(100, 100);
+			world.GetComponent<CameraComponent>().LookAt(100, 100);
 
 			world.GetComponent<TreeNodeComponent>().AddChild(a);
 			world.GetComponent<TreeNodeComponent>().AddChild(b);

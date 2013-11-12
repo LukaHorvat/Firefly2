@@ -59,7 +59,7 @@
     <Compile Include="Components\UpdateComponent.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Exceptions\LayerFullException.cs" />
-    <Compile Include="Facilities\Camera.cs" />
+    <Compile Include="Components\CameraComponent.cs" />
     <Compile Include="Facilities\Chunk.cs" />
     <Compile Include="Facilities\DefaultShaders.cs" />
     <Compile Include="Facilities\Layer.cs" />
