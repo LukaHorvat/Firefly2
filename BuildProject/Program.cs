@@ -1,5 +1,7 @@
 ﻿using Firefly2;
 using Firefly2.Components;
+using Firefly2.Facilities;
+using Firefly2.Messages.Querying;
 using Firefly2.Utility;
 using OpenTK;
 using System;
@@ -19,13 +21,60 @@ namespace BuildProject
 		{
 			var stage = new Stage(800, 500, "Hello World");
 
-			stage.TreeNode.AddChild(new Entity
+			var world = new Entity
+			{
+				new TransformComponent(stage.Renderer),
+				new TreeNodeComponent(),
+				new RenderBufferComponent(stage.Renderer)
+			};
+			stage.TreeNode.AddChild(world);
+
+			var camera = new Camera(world);
+
+			var a = MakeRectangle(stage.Renderer, stage.GetMouse());
+			var b = MakeRectangle(stage.Renderer, stage.GetMouse());
+			var c = MakeRectangle(stage.Renderer, stage.GetMouse());
+			b.GetComponent<TransformComponent>().X = 100;
+			c.GetComponent<TransformComponent>().X = 200;
+
+			stage.Update.Update += delegate
+			{
+				new List<Entity>() { a, b, c }.ForEach(ent =>
+				{
+					var intersects = ent.GetComponent<MouseInteractionComponent>()
+						.AnswerMessage(
+						MouseIntersectQuery.Instance);
+					if (intersects == MouseIntersectAnswer.Intersects)
+					{
+						ent.GetComponent<TransformComponent>().ScaleX = 0.6;
+						ent.GetComponent<TransformComponent>().ScaleY = 0.6;
+					}
+					else
+					{
+						ent.GetComponent<TransformComponent>().ScaleX = 0.5;
+						ent.GetComponent<TransformComponent>().ScaleY = 0.5;
+					}
+				});
+			};
+
+			camera.LookAt(100, 100);
+
+			world.GetComponent<TreeNodeComponent>().AddChild(a);
+			world.GetComponent<TreeNodeComponent>().AddChild(b);
+			world.GetComponent<TreeNodeComponent>().AddChild(c);
+
+			stage.Run();
+		}
+
+		static Entity MakeRectangle(Renderer renderer, MutableVector2 mouse)
+		{
+			return new Entity
 			{
 				new GeometryComponent
 				{
 					new Vector2d(0, 0),
-					new Vector2d(100, 0),
-					new Vector2d(100, 100),
+					new Vector2d(200, 0),
+					new Vector2d(200, 100),
 					new Vector2d(0, 100)
 				},
 				new ShapeColorComponent
@@ -35,11 +84,11 @@ namespace BuildProject
 					new Vector4(0, 0, 1, 1),
 					new Vector4(1, 1, 0, 1)
 				},
-				new RenderBufferComponent(stage.Renderer),
-				new TreeNodeComponent()
-			});
-
-			stage.Run();
+				new RenderBufferComponent(renderer),
+				new TreeNodeComponent(),
+				new TransformComponent(renderer),
+				new MouseInteractionComponent(mouse)
+			};
 		}
 	}
 }

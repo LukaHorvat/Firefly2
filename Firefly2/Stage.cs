@@ -1,6 +1,7 @@
 ﻿using Firefly2.Components;
 using Firefly2.Facilities;
 using Firefly2.Messages;
+using Firefly2.Utility;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -71,6 +72,21 @@ namespace Firefly2
 		public void Run()
 		{
 			Window.Run();
+		}
+
+		private MutableVector2 mouse;
+		public MutableVector2 GetMouse()
+		{
+			if (mouse != null) return mouse;
+			var m = Window.Mouse;
+			var vec = new MutableVector2(0, 0);
+			m.Move += delegate
+			{
+				vec.X = m.X - Window.Width / 2;
+				vec.Y = m.Y - Window.Height / 2;
+			};
+			mouse = vec;
+			return vec;
 		}
 	}
 }

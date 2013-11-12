@@ -1,5 +1,7 @@
 ﻿using Firefly2.Messages.Querying;
+using Firefly2.Utility;
 using OpenTK;
+using OpenTK.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +14,13 @@ namespace Firefly2.Components
 	public class MouseInteractionComponent : Component,
 							IAnswersMessage<MouseIntersectQuery, MouseIntersectAnswer>
 	{
+		public MutableVector2 Mouse;
+
+		public MouseInteractionComponent(MutableVector2 mouse)
+		{
+			Mouse = mouse;
+		}
+
 		public MouseIntersectAnswer AnswerMessage(MouseIntersectQuery msg)
 		{
 			var geometry = Host.GetComponent<GeometryComponent>();
@@ -20,7 +29,7 @@ namespace Firefly2.Components
 			if (geometry != null && transform != null)
 			{
 				var transformedMouse = Vector4.Transform(
-					new Vector4((float)msg.MousePosition.X, (float)msg.MousePosition.Y, 0, 1),
+					new Vector4((float)Mouse.X, (float)Mouse.Y, 0, 1),
 					transform.ModelMatrix.Inverted());
 				if (geometry.IntersectsPoint(new Vector2d(transformedMouse.X, transformedMouse.Y))) return MouseIntersectAnswer.Intersects;
 			}

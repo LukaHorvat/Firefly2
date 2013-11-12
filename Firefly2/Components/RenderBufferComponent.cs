@@ -128,6 +128,7 @@ namespace Firefly2.Components
 		public void TakeMessage(AfterUpdateMessage msg)
 		{
 			if (!needsUpdate) return;
+			if (Geometry == null) return;
 
 			var poly = Triangulation.MakePolygon(Geometry.Polygon);
 			for (int i = 0; i < poly.Points.Count; ++i)

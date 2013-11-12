@@ -9,12 +9,9 @@ namespace Firefly2.Messages.Querying
 {
 	public class MouseIntersectQuery
 	{
-		public Vector2d MousePosition;
+		public static MouseIntersectQuery Instance = new MouseIntersectQuery();
 
-		public MouseIntersectQuery(Vector2d mousePosition)
-		{
-			MousePosition = mousePosition;
-		}
+		private MouseIntersectQuery() { }
 	}
 
 	public enum MouseIntersectAnswer

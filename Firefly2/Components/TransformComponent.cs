@@ -131,5 +131,10 @@ namespace Firefly2.Components
 		{
 			if (tree.Parent.Host is Stage) Host.SendMessage(StartRendering.Instance);
 		}
+
+		public Vector4 TransformPoint(Vector4 input)
+		{
+			return Vector4.Transform(input, ModelMatrix);
+		}
 	}
 }

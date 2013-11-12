@@ -92,6 +92,7 @@
     <Compile Include="Utility\Debug.cs" />
     <Compile Include="Utility\Extensions.cs" />
     <Compile Include="Utility\Geometry.cs" />
+    <Compile Include="Utility\MutableVector2.cs" />
     <Compile Include="Utility\PriorityQueue.cs" />
     <Compile Include="Utility\Triangulation.cs" />
   </ItemGroup>
