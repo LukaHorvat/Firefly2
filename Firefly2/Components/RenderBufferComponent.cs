@@ -80,7 +80,7 @@ namespace Firefly2.Components
 		{
 			get { return Host.GetComponent<TransformComponent>(); }
 		}
-		private short transformIndex = 0;
+		private short transformIndex = -1;
 
 		public Renderer Renderer;
 		public byte[] Data;
@@ -152,6 +152,14 @@ namespace Firefly2.Components
 			if (!needsUpdate) return;
 			if (Geometry == null) return;
 
+			if (transformIndex == -1)
+			{
+				var transform = Host.GetComponent<TransformComponent>();
+				Matrix4 mat = Matrix4.Identity;
+				if (transform != null) mat = transform.ModelMatrix;
+				transformIndex = Renderer.ProcessTransform(this, mat);
+			}
+
 			var poly = Triangulation.MakePolygon(Geometry.Polygon);
 			for (int i = 0; i < poly.Points.Count; ++i)
 			{
@@ -211,6 +219,7 @@ namespace Firefly2.Components
 			rendering = RenderingStatus.NotRenderingParentInvisible;
 			Renderer.RemoveRenderBuffer(this);
 			Renderer.RemoveTransform(this);
+			transformIndex = -1;
 			tree.Send(StopRendering.Instance, TreeNodeComponent.SendRange.ImmediateChildrenOnly);
 		}
 
