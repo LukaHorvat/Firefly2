@@ -12,11 +12,7 @@ namespace Firefly2.Components
 	public class TransformComponent : Component,
 										ITakesMessage<AfterUpdateMessage>,
 										ITakesMessage<ParentTransformChanged>,
-										ITakesMessage<NewChild>,
-										ITakesMessage<NewParent>,
-										ITakesMessage<RemovedFromParent>,
-										ITakesMessage<StartRendering>,
-										ITakesMessage<StopRendering>
+										ITakesMessage<ComponentCollectionChanged>
 	{
 		private class TransformState
 		{
@@ -50,22 +46,20 @@ namespace Firefly2.Components
 			}
 		}
 
-		private bool rendering = false;
 		private TransformState lastState;
 		private Matrix4 personalMatrix, lastParentMatrix;
 		private TreeNodeComponent tree
 		{
 			get { return Host.GetComponent<TreeNodeComponent>(); }
 		}
+		private Uplink<TransformComponent> uplink;
 
 		public short ObjectIndex = -1;
 		public double ScaleX = 1, ScaleY = 1, X = 0, Y = 0, Rotation = 0;
 		public Matrix4 ModelMatrix;
-		public Renderer Renderer;
 
-		public TransformComponent(Renderer renderer)
+		public TransformComponent()
 		{
-			Renderer = renderer;
 			lastState = new TransformState();
 			lastParentMatrix = ModelMatrix = personalMatrix = Matrix4.Identity;
 		}
@@ -88,53 +82,28 @@ namespace Firefly2.Components
 		private void RegenerateMatrix()
 		{
 			Matrix4.Mult(ref personalMatrix, ref lastParentMatrix, out ModelMatrix);
-			Renderer.ProcessTransform(this);
+			Host.SendMessage(TransformationChanged.Instance);
 			if (tree != null) tree.Send(new ParentTransformChanged(ModelMatrix), TreeNodeComponent.SendRange.ImmediateChildrenOnly);
-		}
-
-		public void TakeMessage(NewChild msg)
-		{
-			msg.Child.Host.SendMessage(new ParentTransformChanged(ModelMatrix));
-		}
-
-		public void TakeMessage(RemovedFromParent msg)
-		{
-			lastParentMatrix = Matrix4.Identity;
-			RegenerateMatrix();
-		}
-
-		public void TakeMessage(StartRendering msg)
-		{
-			if (!rendering)
-			{
-				rendering = true;
-				var index = Renderer.ProcessTransform(this);
-				if (ObjectIndex != index)
-				{
-					ObjectIndex = index;
-					Host.SendMessage(new NewTransformIndex(index));
-				}
-			}
-		}
-
-		public void TakeMessage(StopRendering msg)
-		{
-			if (rendering)
-			{
-				rendering = false;
-				Renderer.RemoveTransform(this);
-				ObjectIndex = -1;
-			}
-		}
-
-		public void TakeMessage(NewParent msg)
-		{
-			if (tree.Parent.Host is Stage) Host.SendMessage(StartRendering.Instance);
 		}
 
 		public Vector4 TransformPoint(Vector4 input)
 		{
 			return Vector4.Transform(input, ModelMatrix);
+		}
+
+		public void TakeMessage(ComponentCollectionChanged msg)
+		{
+			if (msg.Target is TreeNodeComponent)
+			{
+				var treeNode = msg.Target as TreeNodeComponent;
+				uplink = tree.CreateUplink<TransformComponent>();
+				uplink.EndpointChanged += delegate
+				{
+					if (uplink.Component == null) lastParentMatrix = Matrix4.Identity;
+					else lastParentMatrix = uplink.Component.ModelMatrix;
+					RegenerateMatrix();
+				};
+			}
 		}
 	}
 }

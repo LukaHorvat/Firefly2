@@ -6,13 +6,10 @@ using System.Threading.Tasks;
 
 namespace Firefly2.Messages
 {
-	public class NewTransformIndex
+	public class TransformationChanged
 	{
-		public short Index;
+		public static TransformationChanged Instance = new TransformationChanged();
 
-		public NewTransformIndex(short index)
-		{
-			Index = index;
-		}
+		private TransformationChanged() { }
 	}
 }

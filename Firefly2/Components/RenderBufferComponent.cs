@@ -14,7 +14,7 @@ namespace Firefly2.Components
 	public class RenderBufferComponent : Component, ITakesMessage<GeometryChanged>,
 													ITakesMessage<ShapeColorChanged>,
 													ITakesMessage<TexCoordsChanged>,
-													ITakesMessage<NewTransformIndex>,
+													ITakesMessage<TransformationChanged>,
 													ITakesMessage<AfterUpdateMessage>,
 													ITakesMessage<StartRendering>,
 													ITakesMessage<StopRendering>,
@@ -210,13 +210,18 @@ namespace Firefly2.Components
 		{
 			rendering = RenderingStatus.NotRenderingParentInvisible;
 			Renderer.RemoveRenderBuffer(this);
+			Renderer.RemoveTransform(this);
 			tree.Send(StopRendering.Instance, TreeNodeComponent.SendRange.ImmediateChildrenOnly);
 		}
 
-		public void TakeMessage(NewTransformIndex msg)
+		public void TakeMessage(TransformationChanged msg)
 		{
-			transformIndex = msg.Index;
-			needsUpdate = true;
+			var newIndex = Renderer.ProcessTransform(this, Host.GetComponent<TransformComponent>().ModelMatrix);
+			if (transformIndex != newIndex)
+			{
+				transformIndex = newIndex;
+				needsUpdate = true;
+			}
 		}
 
 		public void TakeMessage(ComponentCollectionChanged msg)

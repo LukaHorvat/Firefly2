@@ -1,5 +1,6 @@
 ﻿using Firefly2.Components;
 using Firefly2.Exceptions;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace Firefly2.Facilities
 		private List<Chunk> chunks;
 		private Dictionary<RenderBufferComponent, Location> bufferMap;
 		private SortedSet<short> freeIndices;
-		private Dictionary<TransformComponent, short> transformMap;
+		private Dictionary<RenderBufferComponent, short> transformMap;
 		private float[] uniforms;
 		private int tbo;
 		private int texture;
@@ -40,7 +41,7 @@ namespace Firefly2.Facilities
 		{
 			chunks = new List<Chunk>();
 			bufferMap = new Dictionary<RenderBufferComponent, Location>();
-			transformMap = new Dictionary<TransformComponent, short>();
+			transformMap = new Dictionary<RenderBufferComponent, short>();
 			freeIndices = new SortedSet<short>();
 			uniforms = new float[1024 * 8 * elementsPerMatrix];
 			uniforms[0] = 1;
@@ -60,7 +61,7 @@ namespace Firefly2.Facilities
 			GL.TexBuffer(TextureBufferTarget.TextureBuffer, SizedInternalFormat.R32f, tbo);
 		}
 
-		public void ModifyOrAdd(RenderBufferComponent buffer)
+		public void ModifyOrAddRenderBuffer(RenderBufferComponent buffer)
 		{
 			if (bufferMap.ContainsKey(buffer))
 			{
@@ -102,7 +103,7 @@ namespace Firefly2.Facilities
 		}
 
 		private static byte[] emptyByteArray = new byte[0];
-		public void Remove(RenderBufferComponent buffer)
+		public void RemoveRenderBuffer(RenderBufferComponent buffer)
 		{
 			if (bufferMap.ContainsKey(buffer))
 			{
@@ -111,37 +112,37 @@ namespace Firefly2.Facilities
 			}
 		}
 
-		public short ModifyOrAdd(TransformComponent transform)
+		public short ModifyOrAddTransform(RenderBufferComponent renderBuffer, Matrix4 matrix)
 		{
-			if (!transformMap.ContainsKey(transform))
+			if (!transformMap.ContainsKey(renderBuffer))
 			{
 				if (freeIndices.Count == 0) throw new LayerFullException();
-				transformMap[transform] = freeIndices.First();
+				transformMap[renderBuffer] = freeIndices.First();
 				freeIndices.Remove(freeIndices.First());
 			}
-			int index = transformMap[transform] * elementsPerMatrix;
+			int index = transformMap[renderBuffer] * elementsPerMatrix;
 			int offset = 0;
 			for (int i = 0; i < 2; ++i)
 			{
 				for (int j = 0; j < 2; ++j)
 				{
-					uniforms[index + offset] = transform.ModelMatrix[i, j];
+					uniforms[index + offset] = matrix[i, j];
 					offset++;
 				}
 			}
-			uniforms[index + offset] = (float)transform.ModelMatrix[3, 0];
-			uniforms[index + offset + 1] = (float)transform.ModelMatrix[3, 1];
+			uniforms[index + offset] = (float)matrix[3, 0];
+			uniforms[index + offset + 1] = (float)matrix[3, 1];
 			needsUpdate = true;
 
-			return transformMap[transform];
+			return transformMap[renderBuffer];
 		}
 
-		public void Remove(TransformComponent transform)
+		public void RemoveTransform(RenderBufferComponent renderBuffer)
 		{
-			if (transformMap.ContainsKey(transform))
+			if (transformMap.ContainsKey(renderBuffer))
 			{
-				freeIndices.Add(transformMap[transform]);
-				transformMap.Remove(transform);
+				freeIndices.Add(transformMap[renderBuffer]);
+				transformMap.Remove(renderBuffer);
 			}
 		}
 

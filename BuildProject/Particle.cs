@@ -19,7 +19,7 @@ namespace BuildProject
 			var rand = new Random();
 			AddComponent<GeometryComponent>();
 			AddComponent<ShapeColorComponent>();
-			Add(transform = new TransformComponent(stage.Renderer));
+			Add(transform = new TransformComponent());
 			Add(new RenderBufferComponent(stage.Renderer));
 			AddComponent<TreeNodeComponent>();
 			AddComponent<UpdateComponent>();

@@ -73,22 +73,22 @@ namespace Firefly2.Facilities
 
 		public void ProcessRenderBuffer(RenderBufferComponent buffer)
 		{
-			GetLayer("default").ModifyOrAdd(buffer);
+			GetLayer("default").ModifyOrAddRenderBuffer(buffer);
 		}
 
 		public void RemoveRenderBuffer(RenderBufferComponent buffer)
 		{
-			GetLayer("default").Remove(buffer);
+			GetLayer("default").RemoveRenderBuffer(buffer);
 		}
 
-		public short ProcessTransform(TransformComponent transform)
+		public short ProcessTransform(RenderBufferComponent renderBuffer, Matrix4 matrix)
 		{
-			return GetLayer("default").ModifyOrAdd(transform);
+			return GetLayer("default").ModifyOrAddTransform(renderBuffer, matrix);
 		}
 
-		public void RemoveTransform(TransformComponent transform)
+		public void RemoveTransform(RenderBufferComponent renderBuffer)
 		{
-			GetLayer("default").Remove(transform);
+			GetLayer("default").RemoveTransform(renderBuffer);
 		}
 
 		public void Render()
