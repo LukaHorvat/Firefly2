@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -11,8 +12,11 @@ using System.Threading.Tasks;
 
 namespace Firefly2
 {
+	[DebuggerDisplay("{DebuggerDisplay}")]
 	public class Entity : IEnumerable<Component>
 	{
+		private string DebuggerDisplay { get { return "{Firefly2.Entity{" + Name + "}}"; } }
+
 		/// <summary>
 		/// Attribute that marks a property as a shorthand to a component. Can only be added to
 		/// properties whose type is a subclass of Component.
@@ -27,8 +31,18 @@ namespace Firefly2
 
 		public static Dictionary<Type, Dictionary<string, Action<Entity, object>>> shorthandMap
 			= new Dictionary<Type, Dictionary<string, Action<Entity, object>>>();
+		public string Name;
 
 		public Entity()
+			: this(Entity.GenerateUniqueName()) { }
+
+		private static long entityCount = 0;
+		public static string GenerateUniqueName()
+		{
+			return "" + ++entityCount;
+		}
+
+		public Entity(string name)
 		{
 			//If this class hasn't already been processed, get all the shorthands it has and cache
 			//setter methods for them. This is done via reflection. The shorthands are modified on
@@ -46,6 +60,8 @@ namespace Firefly2
 					shorthandMap[type][shorthand.PropertyType.Name] = (Action<Entity, object>)method.Invoke(null, new object[] { shorthand.GetSetMethod(true) });
 				}
 			}
+
+			this.Name = name;
 
 			Components = new ObservableCollection<Component>();
 			componentsByName = new Dictionary<string, Component>();

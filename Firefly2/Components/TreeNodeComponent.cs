@@ -183,6 +183,7 @@ namespace Firefly2.Components
 			where T : Component
 		{
 			var link = new Uplink<T>();
+			link.HomeNode = this;
 			uplinks.AddLast(new WeakReference<Uplink>(link));
 			RestoreUplink(link);
 			return link;
@@ -198,6 +199,7 @@ namespace Firefly2.Components
 				if (comp != null)
 				{
 					link.CastAndSetComponent(comp);
+					if (current.Parent != null) current.Parent.RemoveUplink(link);
 					break;
 				}
 				current.uplinks.AddLast(new WeakReference<Uplink>(link));
@@ -205,6 +207,11 @@ namespace Firefly2.Components
 			}
 		}
 
+		/// <summary>
+		/// Removes the specified uplink from this node and all the upward ones. Doesn't change
+		/// the value of the link
+		/// </summary>
+		/// <param name="link"></param>
 		public void RemoveUplink(Uplink link)
 		{
 			var current = this;
@@ -219,6 +226,7 @@ namespace Firefly2.Components
 			where T : Component
 		{
 			var link = new Downlink<T>();
+			link.HomeNode = this;
 			downlinks.AddLast(new WeakReference<Downlink>(link));
 			RestoreDownlink(link);
 			return link;
@@ -235,6 +243,7 @@ namespace Firefly2.Components
 				if (comp != null)
 				{
 					link.CastAndAddComponent(comp);
+					node.RemoveDownlink(link);
 					return false;
 				}
 				node.downlinks.AddLast(new WeakReference<Downlink>(link));
@@ -242,6 +251,11 @@ namespace Firefly2.Components
 			});
 		}
 
+		/// <summary>
+		/// Removes the specified downlink from the children nodes, and propagates downwards.
+		/// Removes matching components from the downlink if any are found.
+		/// </summary>
+		/// <param name="link"></param>
 		public void RemoveDownlink(Downlink link)
 		{
 			BFS(node =>
@@ -339,7 +353,7 @@ namespace Firefly2.Components
 			{
 				var ulinks = uplinks
 					.Select(refer => refer.GetTarget())
-					.Where(link => link != null && link.ContainsComponentsLike(msg.Target));
+					.Where(link => link != null && link.HomeNode != this && link.ContainsComponentsLike(msg.Target));
 				if (ulinks.Count() > 0)
 				{
 					if (Parent != null) Parent.RemoveUplink(ulinks.First());
@@ -347,7 +361,7 @@ namespace Firefly2.Components
 				}
 				var dlinks = downlinks
 					.Select(refer => refer.GetTarget())
-					.Where(link => link != null && link.ContainsComponentsLike(msg.Target));
+					.Where(link => link != null && link.HomeNode != this && link.ContainsComponentsLike(msg.Target));
 				if (dlinks.Count() > 0)
 				{
 					foreach (var child in Children) child.RemoveDownlink(dlinks.First());
@@ -362,7 +376,7 @@ namespace Firefly2.Components
 					{
 						Uplink uplink = refer.GetTarget();
 						if (uplink == null) continue;
-						if (uplink.ContainsComponentsLike(msg.Target))
+						if (uplink.ContainsComponentsLike(msg.Target) && uplink.HomeNode != this)
 						{
 							uplink.CastAndSetComponent(null);
 							uplink.CallGenericRelink(child);
@@ -375,7 +389,7 @@ namespace Firefly2.Components
 					{
 						Downlink downlink = refer.GetTarget();
 						if (downlink == null) continue;
-						if (downlink.ContainsComponentsLike(msg.Target))
+						if (downlink.ContainsComponentsLike(msg.Target) && downlink.HomeNode != this)
 						{
 							downlink.CastAndRemoveComponent(msg.Target);
 							downlink.CallGenericRelink(Parent);
@@ -384,5 +398,25 @@ namespace Firefly2.Components
 				}
 			}
 		}
+
+		public void WriteToConsole()
+		{
+			TreeNodeComponent current = this, root = null;
+			while (current != null)
+			{
+				root = current;
+				current = current.Parent;
+			}
+			root.WriteNodeToConsole(this, 0);
+		}
+
+		private void WriteNodeToConsole(TreeNodeComponent toMark, int tablevel)
+		{
+			for (int i = 0; i < tablevel; ++i) Console.Write("\t");
+			if (this == toMark) Console.Write(">>");
+			Console.WriteLine("node");
+			foreach (var child in Children) child.WriteNodeToConsole(toMark, tablevel + 1);
+		}
+
 	}
 }

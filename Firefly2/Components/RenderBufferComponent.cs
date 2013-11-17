@@ -16,14 +16,18 @@ namespace Firefly2.Components
 													ITakesMessage<TexCoordsChanged>,
 													ITakesMessage<NewTransformIndex>,
 													ITakesMessage<AfterUpdateMessage>,
-													ITakesMessage<RemovedFromParent>,
-													ITakesMessage<NewChild>,
-													ITakesMessage<NewParent>,
 													ITakesMessage<StartRendering>,
 													ITakesMessage<StopRendering>,
 													ITakesMessage<AddedToEntity>,
 													ITakesMessage<ComponentCollectionChanged>
 	{
+		enum RenderingStatus
+		{
+			Rendering,
+			NotRenderingParentInvisible,
+			NotRenderingSelfInvisible
+		}
+
 		private class VertexData
 		{
 			public Vector2d Coordinates;
@@ -64,10 +68,10 @@ namespace Firefly2.Components
 			}
 		}
 
-		private RenderBufferComponent uplink;
+		private Uplink<RenderBufferComponent> uplink;
 		private bool needsUpdate = false;
 		private Dictionary<uint, VertexData> triangulationMap;
-		private bool rendering = false;
+		private RenderingStatus rendering = RenderingStatus.NotRenderingParentInvisible;
 		private TreeNodeComponent tree
 		{
 			get { return Host.GetComponent<TreeNodeComponent>(); }
@@ -80,6 +84,24 @@ namespace Firefly2.Components
 
 		public Renderer Renderer;
 		public byte[] Data;
+
+		private bool visible;
+		public bool Visible{
+			get
+			{
+				return visible;
+			}
+			set
+			{
+				visible = value;
+				if (value && rendering == RenderingStatus.NotRenderingSelfInvisible) StartRender();
+				else if (!value && rendering == RenderingStatus.Rendering)
+				{
+					StopRender();
+					rendering = RenderingStatus.NotRenderingSelfInvisible;
+				}
+			}
+		}
 
 		protected ShapeColorComponent ShapeColor
 		{
@@ -167,36 +189,26 @@ namespace Firefly2.Components
 			needsUpdate = false;
 		}
 
-		public void TakeMessage(NewChild msg)
-		{
-			if (rendering) tree.Send(StartRendering.Instance, TreeNodeComponent.SendRange.ImmediateChildrenOnly);
-		}
-
-		public void TakeMessage(RemovedFromParent msg)
-		{
-			if (rendering) StopRender();
-		}
-
 		public void TakeMessage(StartRendering msg)
 		{
-			if (!rendering) StartRender();
+			if (rendering == RenderingStatus.NotRenderingParentInvisible) StartRender();
 		}
 
 		public void TakeMessage(StopRendering msg)
 		{
-			if (rendering) StopRender();
+			if (rendering == RenderingStatus.Rendering) StopRender();
 		}
 
 		private void StartRender()
 		{
-			rendering = true;
+			rendering = RenderingStatus.Rendering;
 			needsUpdate = true;
 			tree.Send(StartRendering.Instance, TreeNodeComponent.SendRange.ImmediateChildrenOnly);
 		}
 
 		private void StopRender()
 		{
-			rendering = false;
+			rendering = RenderingStatus.NotRenderingParentInvisible;
 			Renderer.RemoveRenderBuffer(this);
 			tree.Send(StopRendering.Instance, TreeNodeComponent.SendRange.ImmediateChildrenOnly);
 		}
@@ -207,16 +219,35 @@ namespace Firefly2.Components
 			needsUpdate = true;
 		}
 
-		public void TakeMessage(NewParent msg)
-		{
-			if (tree.Parent.Host is Stage) Host.SendMessage(StartRendering.Instance);
-		}
-
 		public void TakeMessage(ComponentCollectionChanged msg)
 		{
 			if (msg.Target is GeometryComponent || msg.Target is ShapeColorComponent || msg.Target is TextureComponent)
 			{
 				needsUpdate = true;
+			}
+			if (msg.Target is TreeNodeComponent)
+			{
+				if (Host is Stage)
+				{
+					Visible = true;
+					rendering = RenderingStatus.Rendering;
+				}
+				var treeNode = msg.Target as TreeNodeComponent;
+				uplink = tree.CreateUplink<RenderBufferComponent>();
+				uplink.EndpointChanged += delegate
+				{
+					bool parentWantsToRender =
+						(Host is Stage) ||
+						(uplink.Component != null && uplink.Component.visible);
+					if (rendering == RenderingStatus.NotRenderingParentInvisible && parentWantsToRender)
+					{
+						StartRender();
+					}
+					else if (rendering == RenderingStatus.Rendering && !parentWantsToRender)
+					{
+						StopRender();
+					}
+				};
 			}
 		}
 	}

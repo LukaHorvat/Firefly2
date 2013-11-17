@@ -65,6 +65,7 @@ namespace Firefly2
 
 			AddComponent<TreeNodeComponent>();
 			AddComponent<UpdateComponent>();
+			AddComponent(new RenderBufferComponent(Renderer));
 
 			Renderer = new Renderer(width, height);
 		}

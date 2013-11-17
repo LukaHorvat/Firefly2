@@ -25,7 +25,6 @@ namespace BuildProject
 			{
 				new TransformComponent(stage.Renderer),
 				new TreeNodeComponent(),
-				new RenderBufferComponent(stage.Renderer),
 				new CameraComponent()
 			};
 			stage.TreeNode.AddChild(world);
@@ -36,23 +35,23 @@ namespace BuildProject
 			b.GetComponent<TransformComponent>().X = 100;
 			c.GetComponent<TransformComponent>().X = 200;
 
-			stage.Update.Update += delegate
-			{
-				new List<Entity>() { a, b, c }.ForEach(ent =>
-				{
-					var intersects = ent.GetComponent<MouseInteractionComponent>().IntersectsMouse;
-					if (intersects)
-					{
-						ent.GetComponent<TransformComponent>().ScaleX = 0.6;
-						ent.GetComponent<TransformComponent>().ScaleY = 0.6;
-					}
-					else
-					{
-						ent.GetComponent<TransformComponent>().ScaleX = 0.5;
-						ent.GetComponent<TransformComponent>().ScaleY = 0.5;
-					}
-				});
-			};
+			//stage.Update.Update += delegate
+			//{
+			//	new List<Entity>() { a, b, c }.ForEach(ent =>
+			//	{
+			//		var intersects = ent.GetComponent<MouseInteractionComponent>().IntersectsMouse;
+			//		if (intersects)
+			//		{
+			//			ent.GetComponent<TransformComponent>().ScaleX = 0.6;
+			//			ent.GetComponent<TransformComponent>().ScaleY = 0.6;
+			//		}
+			//		else
+			//		{
+			//			ent.GetComponent<TransformComponent>().ScaleX = 0.5;
+			//			ent.GetComponent<TransformComponent>().ScaleY = 0.5;
+			//		}
+			//	});
+			//};
 
 			world.GetComponent<CameraComponent>().LookAt(100, 100);
 

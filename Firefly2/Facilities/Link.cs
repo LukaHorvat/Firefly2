@@ -11,6 +11,9 @@ namespace Firefly2.Facilities
 	{
 		internal abstract void CallGenericRelink(TreeNodeComponent node);
 		internal abstract bool ContainsComponentsLike(Component comp);
+		public event Action EndpointChanged;
+		internal TreeNodeComponent HomeNode;
+		protected void RaiseEvent() { if (EndpointChanged != null) EndpointChanged(); }
 	}
 
 	public abstract class Uplink : Link
@@ -27,6 +30,7 @@ namespace Firefly2.Facilities
 		internal override void CastAndSetComponent(Component component)
 		{
 			Component = (T)component;
+			RaiseEvent();
 		}
 
 		internal override void CallGenericRelink(TreeNodeComponent node)
@@ -60,11 +64,13 @@ namespace Firefly2.Facilities
 		internal override void CastAndAddComponent(Component component)
 		{
 			Components.AddLast((T)component);
+			RaiseEvent();
 		}
 
 		internal override void CastAndRemoveComponent(Component component)
 		{
 			Components.Remove((T)component);
+			RaiseEvent();
 		}
 
 		internal override void CallGenericRelink(TreeNodeComponent node)
@@ -75,6 +81,7 @@ namespace Firefly2.Facilities
 		internal override void RemoveMatchingComponent(TreeNodeComponent node)
 		{
 			Components.Remove(node.Host.GetComponent<T>());
+			RaiseEvent();
 		}
 
 		internal override bool ContainsComponentsLike(Component comp)
