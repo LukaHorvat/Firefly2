@@ -19,45 +19,45 @@ namespace BuildProject
 	{
 		static void Main(string[] args)
 		{
+			//var bmp = new Bitmap(360, 10);
+			//for (int i = 0; i < 360; ++i)
+			//{
+			//	for (int j = 0; j < 10; ++j)
+			//	{
+			//		var col = Firefly2.Utility.Color.HSVToRGB(i, 1, 1, 1);
+			//		bmp.SetPixel(i, j, System.Drawing.Color.FromArgb((int)(col.X * 255), (int)(col.Y * 255), (int)(col.Z * 255)));
+			//	}
+			//}
+			//bmp.Save("C:/pic.png");
+
 			var stage = new Stage(800, 500, "Hello World");
 
-			var world = new Entity
-			{
+			var rectangle = new Entity{
+				new RenderBufferComponent(stage.Renderer),
 				new TransformComponent(),
-				new TreeNodeComponent(),
-				new CameraComponent()
+				new GeometryComponent(),
+				new ShapeColorComponent(),
+				new TreeNodeComponent()
 			};
-			stage.TreeNode.AddChild(world);
+			//for (int i = 0; i < 360; ++i)
+			//{
+			//	rectangle.GetComponent<GeometryComponent>().Add(new Vector2d(i, 0));
+			//	rectangle.GetComponent<ShapeColorComponent>().Add(Color.HSVToRGB(i, 1, 1, 1));
+			//}
+			//for (int i = 360; i < 0; ++i)
+			//{
+			//	rectangle.GetComponent<GeometryComponent>().Add(new Vector2d(i, 100));
+			//	rectangle.GetComponent<ShapeColorComponent>().Add(Color.HSVToRGB(i, 1, 1, 1));
+			//}
 
-			var a = MakeRectangle(stage.Renderer, stage.GetMouse());
-			var b = MakeRectangle(stage.Renderer, stage.GetMouse());
-			var c = MakeRectangle(stage.Renderer, stage.GetMouse());
-			b.GetComponent<TransformComponent>().X = 100;
-			c.GetComponent<TransformComponent>().X = 200;
-
-			stage.Update.Update += delegate
+			for (int i = 0; i < 360; ++i)
 			{
-				new List<Entity>() { a, b, c }.ForEach(ent =>
-				{
-					var intersects = ent.GetComponent<MouseInteractionComponent>().IntersectsMouse;
-					if (intersects)
-					{
-						ent.GetComponent<TransformComponent>().ScaleX = 0.6;
-						ent.GetComponent<TransformComponent>().ScaleY = 0.6;
-					}
-					else
-					{
-						ent.GetComponent<TransformComponent>().ScaleX = 0.5;
-						ent.GetComponent<TransformComponent>().ScaleY = 0.5;
-					}
-				});
-			};
-
-			world.GetComponent<CameraComponent>().LookAt(100, 100);
-
-			world.GetComponent<TreeNodeComponent>().AddChild(a);
-			world.GetComponent<TreeNodeComponent>().AddChild(b);
-			world.GetComponent<TreeNodeComponent>().AddChild(c);
+				rectangle.GetComponent<GeometryComponent>().Add(new Vector2d(Math.Cos(i / 180F * Math.PI) * 200, Math.Sin(i / 180F * Math.PI) * 200));
+				rectangle.GetComponent<ShapeColorComponent>().Add(Color.HSVToRGB(i, 1, 1, 1));
+			}
+			rectangle.GetComponent<GeometryComponent>().Add(new Vector2d(0, 0));
+			rectangle.GetComponent<ShapeColorComponent>().Add(Color.HSVToRGB(0, 0, 0, 1));
+			stage.TreeNode.AddChild(rectangle);
 
 			stage.Run();
 		}
