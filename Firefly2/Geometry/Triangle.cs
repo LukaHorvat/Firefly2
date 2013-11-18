@@ -23,7 +23,7 @@ namespace Firefly2.Geometry
 
 		public static Triangle FromDelaunay(DelaunayTriangle tri)
 		{
-			TriangulationPoint a = tri.Points[0], b = tri.Points[1], c = tri.Points[2];
+			Poly2Tri.TriangulationPoint a = tri.Points[0], b = tri.Points[1], c = tri.Points[2];
 			return new Triangle(new Vector2d(a.X, a.Y), new Vector2d(b.X, b.Y), new Vector2d(c.X, c.Y));
 		}
 	}

@@ -1,4 +1,5 @@
 ﻿using Firefly2.Facilities;
+using Firefly2.Geometry;
 using Firefly2.Messages;
 using Firefly2.Utility;
 using OpenTK;
@@ -28,49 +29,8 @@ namespace Firefly2.Components
 			NotRenderingSelfInvisible
 		}
 
-		private class VertexData
-		{
-			public Vector2d Coordinates;
-			public Vector4 Color;
-			public Vector2 TexCoords;
-			public short TransformIndex;
-
-			public VertexData(Vector2d coords, Vector4 color, Vector2 texCoords, short transformIndex)
-			{
-				Coordinates = coords;
-				Color = color;
-				TexCoords = texCoords;
-				TransformIndex = transformIndex;
-			}
-
-			public VertexData(Vector2d coords, short transformIndex)
-			{
-				Coordinates = coords;
-				TransformIndex = transformIndex;
-			}
-
-			public void WriteToArray(byte[] arr, int index)
-			{
-				using (var writer = new BinaryWriter(new MemoryStream(arr, index, 16)))
-				{
-					writer.Write((float)Coordinates.X);
-					writer.Write((float)Coordinates.Y);
-					writer.Write((byte)(Color.X * 255));
-					writer.Write((byte)(Color.Y * 255));
-					writer.Write((byte)(Color.Z * 255));
-					writer.Write((byte)(Color.W * 255));
-					writer.Write((byte)(TexCoords.X * 255));
-					writer.Write((byte)(TexCoords.Y * 255));
-					writer.Write(TransformIndex);
-
-					writer.BaseStream.Dispose();
-				}
-			}
-		}
-
 		private Uplink<RenderBufferComponent> uplink;
 		private bool needsUpdate = false;
-		private Dictionary<uint, VertexData> triangulationMap;
 		private RenderingStatus rendering = RenderingStatus.NotRenderingParentInvisible;
 		private TreeNodeComponent tree
 		{
@@ -121,7 +81,6 @@ namespace Firefly2.Components
 		public RenderBufferComponent(Renderer renderer)
 		{
 			Renderer = renderer;
-			triangulationMap = new Dictionary<uint, VertexData>();
 			Data = new byte[0];
 		}
 
@@ -163,20 +122,20 @@ namespace Firefly2.Components
 			var poly = Triangulation.MakePolygon(Geometry.Polygon);
 			for (int i = 0; i < poly.Points.Count; ++i)
 			{
-				triangulationMap[poly.Points[i].VertexCode] = new VertexData(Geometry.Polygon[i], transformIndex);
+				(poly.Points[i] as TriangulationPoint).Data = new VertexData(Geometry.Polygon[i], transformIndex);
 			}
 			if (ShapeColor != null && ShapeColor.Colors.Count == Geometry.Polygon.Count)
 			{
 				for (int i = 0; i < ShapeColor.Colors.Count; ++i)
 				{
-					triangulationMap[poly.Points[i].VertexCode].Color = ShapeColor.Colors[i];
+					(poly.Points[i] as TriangulationPoint).Data.Color = ShapeColor.Colors[i];
 				}
 			}
 			if (Texture != null && Texture.TexCoords.Count == Geometry.Polygon.Count)
 			{
 				for (int i = 0; i < Texture.TexCoords.Count; ++i)
 				{
-					triangulationMap[poly.Points[i].VertexCode].TexCoords = Texture.TexCoords[i];
+					(poly.Points[i] as TriangulationPoint).Data.TexCoords = Texture.TexCoords[i];
 				}
 			}
 			var triangles = Triangulation.TriangulatePolygon(poly);
@@ -188,7 +147,10 @@ namespace Firefly2.Components
 			{
 				for (int j = 0; j < 3; ++j)
 				{
-					var pack = triangulationMap[triangles[i].Points[j].VertexCode];
+					var point = triangles[i].Points[j] as TriangulationPoint;
+					VertexData pack;
+					if (point == null) pack = new VertexData(new Vector2d(), new Vector4(), new Vector2(), transformIndex);
+					else pack = point.Data;
 					pack.WriteToArray(Data, (i * 3 + j) * 16);
 				}
 			}

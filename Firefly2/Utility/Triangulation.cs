@@ -13,7 +13,7 @@ namespace Firefly2.Utility
 	{
 		public static Polygon MakePolygon(IEnumerable<Vector2d> poly)
 		{
-			return new Polygon(poly.Select(vec => new PolygonPoint(vec.X, vec.Y)));
+			return new Polygon(poly.Select(vec => new Firefly2.Geometry.TriangulationPoint(vec.X, vec.Y)));
 		}
 
 		public static IList<DelaunayTriangle> TriangulatePolygon(Polygon poly)
