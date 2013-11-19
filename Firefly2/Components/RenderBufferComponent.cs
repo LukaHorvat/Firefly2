@@ -16,6 +16,7 @@ namespace Firefly2.Components
 													ITakesMessage<ShapeColorChanged>,
 													ITakesMessage<TexCoordsChanged>,
 													ITakesMessage<TransformationChanged>,
+													ITakesMessage<RendererChanged>,
 													ITakesMessage<AfterUpdateMessage>,
 													ITakesMessage<StartRendering>,
 													ITakesMessage<StopRendering>,
@@ -42,7 +43,16 @@ namespace Firefly2.Components
 		}
 		private short transformIndex = -1;
 
-		public Renderer Renderer;
+		private Renderer renderer;
+		public Renderer Renderer
+		{
+			get { return renderer; }
+			set
+			{
+				renderer = value;
+				if (tree != null) tree.Send(new RendererChanged(value), TreeNodeComponent.SendRange.ImmediateChildrenOnly);
+			}
+		}
 		public byte[] Data;
 
 		private bool visible;
@@ -78,6 +88,9 @@ namespace Firefly2.Components
 			get { return Host.GetComponent<GeometryComponent>(); }
 		}
 
+		public RenderBufferComponent()
+			: this(null) { }
+
 		public RenderBufferComponent(Renderer renderer)
 		{
 			Renderer = renderer;
@@ -108,6 +121,7 @@ namespace Firefly2.Components
 
 		public void TakeMessage(AfterUpdateMessage msg)
 		{
+			if (renderer == null) return;
 			if (!needsUpdate) return;
 			if (Geometry == null) return;
 
@@ -188,6 +202,11 @@ namespace Firefly2.Components
 			}
 		}
 
+		public void TakeMessage(RendererChanged msg)
+		{
+			if (msg.NewRenderer != Renderer) Renderer = msg.NewRenderer;
+		}
+
 		public void TakeMessage(ComponentCollectionChanged msg)
 		{
 			if (msg.Target is GeometryComponent || msg.Target is ShapeColorComponent || msg.Target is TextureComponent)
@@ -205,9 +224,14 @@ namespace Firefly2.Components
 				uplink = tree.CreateUplink<RenderBufferComponent>();
 				uplink.EndpointChanged += delegate
 				{
-					bool parentWantsToRender =
-						(Host is Stage) ||
-						(uplink.Component != null && uplink.Component.visible);
+					if (uplink.Component == null && !(Host is Stage))
+					{
+						StopRender();
+						return;
+					}
+					if (uplink.Component.Renderer != Renderer) Renderer = uplink.Component.Renderer;
+
+					bool parentWantsToRender = Host is Stage || uplink.Component.visible;
 					if (rendering == RenderingStatus.NotRenderingParentInvisible && parentWantsToRender)
 					{
 						StartRender();

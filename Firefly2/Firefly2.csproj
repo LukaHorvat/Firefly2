@@ -77,6 +77,7 @@
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\NewChild.cs" />
     <Compile Include="Messages\NewParent.cs" />
+    <Compile Include="Messages\RendererChanged.cs" />
     <Compile Include="Messages\TransformationChanged.cs" />
     <Compile Include="Messages\ParentTransformChanged.cs" />
     <Compile Include="Messages\Querying\MouseIntersect.cs" />
