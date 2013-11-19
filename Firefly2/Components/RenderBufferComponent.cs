@@ -119,26 +119,22 @@ namespace Firefly2.Components
 				transformIndex = Renderer.ProcessTransform(this, mat);
 			}
 
-			var poly = Triangulation.MakePolygon(Geometry.Polygon);
-			for (int i = 0; i < poly.Points.Count; ++i)
-			{
-				(poly.Points[i] as TriangulationPoint).Data = new VertexData(Geometry.Polygon[i], transformIndex);
-			}
+			var poly = Geometry.Polygon.Select(vec => new VertexData(vec, transformIndex)).ToList();
 			if (ShapeColor != null && ShapeColor.Colors.Count == Geometry.Polygon.Count)
 			{
 				for (int i = 0; i < ShapeColor.Colors.Count; ++i)
 				{
-					(poly.Points[i] as TriangulationPoint).Data.Color = ShapeColor.Colors[i];
+					poly[i].Color = ShapeColor.Colors[i];
 				}
 			}
 			if (Texture != null && Texture.TexCoords.Count == Geometry.Polygon.Count)
 			{
 				for (int i = 0; i < Texture.TexCoords.Count; ++i)
 				{
-					(poly.Points[i] as TriangulationPoint).Data.TexCoords = Texture.TexCoords[i];
+					poly[i].TexCoords = Texture.TexCoords[i];
 				}
 			}
-			var triangles = Triangulation.TriangulatePolygon(poly);
+			var triangles = Triangulation.Triangulate(poly);
 			if (Data.Length < triangles.Count * 3 * 16)
 			{
 				Data = new byte[triangles.Count * 3 * 16];
@@ -147,10 +143,7 @@ namespace Firefly2.Components
 			{
 				for (int j = 0; j < 3; ++j)
 				{
-					var point = triangles[i].Points[j] as TriangulationPoint;
-					VertexData pack;
-					if (point == null) pack = new VertexData(new Vector2d(), new Vector4(), new Vector2(), transformIndex);
-					else pack = point.Data;
+					var pack = triangles[i].Points[j];
 					pack.WriteToArray(Data, (i * 3 + j) * 16);
 				}
 			}

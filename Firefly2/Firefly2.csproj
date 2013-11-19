@@ -34,10 +34,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\opentk\Binaries\OpenTK\Debug\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="Poly2Tri, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Poly2Tri.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -46,6 +42,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Triangle, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\Triangle.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Component.cs" />
@@ -67,7 +67,7 @@
     <Compile Include="Facilities\Renderer.cs" />
     <Compile Include="Facilities\ShaderProgramInfo.cs" />
     <Compile Include="Geometry\Triangle.cs" />
-    <Compile Include="Geometry\TriangualtionPoint.cs" />
+    <Compile Include="Geometry\VertexData.cs" />
     <Compile Include="ITakesMessage.cs" />
     <Compile Include="IAnswersMessage.cs" />
     <Compile Include="Messages\AddedToEntity.cs" />
@@ -97,6 +97,12 @@
     <Compile Include="Utility\MutableVector2.cs" />
     <Compile Include="Utility\PriorityQueue.cs" />
     <Compile Include="Utility\Triangulation.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Templating\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

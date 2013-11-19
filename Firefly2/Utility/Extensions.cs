@@ -11,6 +11,11 @@ public static class Extensions
 		foreach (var element in list) action(element);
 	}
 
+	public static void ForEach<T>(this IList<T> list, Action<T, int> action)
+	{
+		for (int i = 0; i < list.Count; ++i) action(list[i], i);
+	}
+
 	/// <summary>
 	/// Removes entries that satisfy a condition. Returns true if any entry was removed.
 	/// </summary>

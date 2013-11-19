@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using Poly2Tri;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,14 +8,6 @@ using System.Threading.Tasks;
 
 namespace Firefly2.Geometry
 {
-	internal class TriangulationPoint : PolygonPoint
-	{
-		public VertexData Data;
-
-		public TriangulationPoint(double x, double y)
-			: base(x, y) { }
-	}
-
 	internal class VertexData
 	{
 		public Vector2d Coordinates;

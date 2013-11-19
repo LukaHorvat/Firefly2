@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using Poly2Tri;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,23 +7,17 @@ using System.Threading.Tasks;
 
 namespace Firefly2.Geometry
 {
-	public class Triangle
+	public class Triangle<TVector>
 	{
-		Vector2d[] arr;
+		public TVector[] Points;
 
-		public Vector2d A { get { return arr[0]; } }
-		public Vector2d B { get { return arr[1]; } }
-		public Vector2d C { get { return arr[2]; } }
+		public TVector A { get { return Points[0]; } }
+		public TVector B { get { return Points[1]; } }
+		public TVector C { get { return Points[2]; } }
 
-		public Triangle(Vector2d a, Vector2d b, Vector2d c)
+		public Triangle(TVector a, TVector b, TVector c)
 		{
-			arr = new[] { a, b, c };
-		}
-
-		public static Triangle FromDelaunay(DelaunayTriangle tri)
-		{
-			Poly2Tri.TriangulationPoint a = tri.Points[0], b = tri.Points[1], c = tri.Points[2];
-			return new Triangle(new Vector2d(a.X, a.Y), new Vector2d(b.X, b.Y), new Vector2d(c.X, c.Y));
+			Points = new[] { a, b, c };
 		}
 	}
 }

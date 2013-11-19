@@ -5,26 +5,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Poly2Tri;
+using TriangleNet;
+using TriangleNet.Geometry;
 
 namespace Firefly2.Utility
 {
-	public class Triangulation
+	internal class Triangulation
 	{
-		public static Polygon MakePolygon(IEnumerable<Vector2d> poly)
+		public static List<Triangle<VertexData>> Triangulate(IList<VertexData> points)
 		{
-			return new Polygon(poly.Select(vec => new Firefly2.Geometry.TriangulationPoint(vec.X, vec.Y)));
-		}
-
-		public static IList<DelaunayTriangle> TriangulatePolygon(Polygon poly)
-		{
-			P2T.Triangulate(poly);
-			return poly.Triangles;
-		}
-
-		public static List<Triangle> TriangulatePolygon(IEnumerable<Vector2d> poly)
-		{
-			return TriangulatePolygon(MakePolygon(poly)).Select(Triangle.FromDelaunay).ToList();
+			var mesh = new Mesh();
+			var geom = new InputGeometry();
+			points.ForEach((point, index) =>
+			{
+				//We use the boundary parameter as an index so we can later attach VertexData to
+				//each vertex
+				geom.AddPoint(point.Coordinates.X, point.Coordinates.Y, index);
+				geom.AddSegment(index, (index + 1) % points.Count);
+			});
+			mesh.Triangulate(geom);
+			return mesh.Triangles.Select(triangle =>
+			{
+				return new Triangle<VertexData>(
+					points[triangle.GetVertex(0).Boundary],
+					points[triangle.GetVertex(1).Boundary],
+					points[triangle.GetVertex(2).Boundary]);
+			})
+			.ToList();
 		}
 	}
 }
