@@ -63,11 +63,11 @@ namespace Firefly2
 				Window.SwapBuffers();
 			};
 
+			Renderer = new Renderer(width, height);
+
 			AddComponent<TreeNodeComponent>();
 			AddComponent<UpdateComponent>();
 			AddComponent(new RenderBufferComponent(Renderer));
-
-			Renderer = new Renderer(width, height);
 		}
 
 		public void Run()

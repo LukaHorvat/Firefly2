@@ -49,6 +49,22 @@ namespace Firefly2.Components
 			get { return renderer; }
 			set
 			{
+				if (renderer == value) return;
+
+				if (renderer != null)
+				{
+					renderer.RemoveRenderBuffer(this);
+					renderer.RemoveTransform(this);
+				}
+
+				value.ProcessRenderBuffer(this);
+
+				var mat = Matrix4.Identity;
+				var transform = Host.GetComponent<TransformComponent>();
+				if (transform != null) mat = transform.ModelMatrix;
+				transformIndex = value.ProcessTransform(this, mat);
+
+				needsUpdate = true;
 				renderer = value;
 				if (tree != null) tree.Send(new RendererChanged(value), TreeNodeComponent.SendRange.ImmediateChildrenOnly);
 			}
@@ -56,7 +72,8 @@ namespace Firefly2.Components
 		public byte[] Data;
 
 		private bool visible;
-		public bool Visible{
+		public bool Visible
+		{
 			get
 			{
 				return visible;
@@ -93,7 +110,7 @@ namespace Firefly2.Components
 
 		public RenderBufferComponent(Renderer renderer)
 		{
-			Renderer = renderer;
+			this.renderer = renderer;
 			Data = new byte[0];
 		}
 

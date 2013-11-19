@@ -22,7 +22,7 @@ namespace BuildProject
 			var stage = new Stage(800, 500, "Hello World");
 
 			var circle = new Entity{
-				new RenderBufferComponent(stage.Renderer),
+				new RenderBufferComponent(),
 				new TransformComponent(),
 				new GeometryComponent(),
 				new ShapeColorComponent(),
