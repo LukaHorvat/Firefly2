@@ -17,6 +17,15 @@ namespace BuildProject
 {
 	class Program
 	{
+		[EntityClass("NormalShape",
+			new IncludeComponent<RenderBufferComponent>(),
+			new IncludeComponent<TransformComponent>(),
+			new IncludeComponent<GeometryComponent>(),
+			new IncludeComponent<ShapeColorComponent>(),
+			new IncludeComponent<TreeNodeComponent>()
+		)]
+		Entity ent;
+
 		static void Main(string[] args)
 		{
 			var stage = new Stage(800, 500, "Hello World");
@@ -37,6 +46,9 @@ namespace BuildProject
 			circle.GetComponent<GeometryComponent>().Add(new Vector2d(0, 0));
 			circle.GetComponent<ShapeColorComponent>().Add(Color.HSVToRGB(0, 0, 0, 1));
 			stage.TreeNode.AddChild(circle);
+
+			Console.WriteLine(EntityGenerator.GenerateClasses());
+			VisualStudioHelper
 
 			stage.Run();
 		}
