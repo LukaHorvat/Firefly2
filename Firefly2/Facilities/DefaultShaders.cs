@@ -45,17 +45,11 @@ float get(int offset)
 
 void main()
 {
-	int i = int(index * 32768) * 6;
-//	vec2 position = getPosition(i);
+	int i = int(index * 32768) * 7;
 	mat4 model = mat4(	vec4(get(i), get(i + 1), 0, 0),
 						vec4(get(i + 2), get(i + 3), 0, 0),
 						vec4(0, 0, 1, 0),
-						vec4(get(i + 4), get(i + 5), 0, 1));
-//	mat4 model = mat4(getMatrix(i));
-//	model[2][2] = 1.0;
-//	model[3][3] = 1.0;
-//	model[3][0] = position.x;
-//	model[3][1] = position.y;
+						vec4(get(i + 4), get(i + 5), get(i + 6), 1));
 
 	fragment_color = vertex_color;
 	fragment_texcoords = vertex_texcoords;

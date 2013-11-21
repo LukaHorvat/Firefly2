@@ -35,7 +35,7 @@ namespace Firefly2.Facilities
 		private int texture;
 		private ShaderProgramInfo shaderInfo;
 		private bool needsUpdate = false;
-		private const int elementsPerMatrix = 6;
+		private const int elementsPerMatrix = 7;
 
 		public Layer(ShaderProgramInfo shaderInfo)
 		{
@@ -132,6 +132,7 @@ namespace Firefly2.Facilities
 			}
 			uniforms[index + offset] = (float)matrix[3, 0];
 			uniforms[index + offset + 1] = (float)matrix[3, 1];
+			uniforms[index + offset + 2] = (float)matrix[3, 2];
 			needsUpdate = true;
 
 			return transformMap[renderBuffer];

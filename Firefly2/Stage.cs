@@ -37,6 +37,7 @@ namespace Firefly2
 			Window.Load += delegate
 			{
 				GL.ClearColor(Color4.Black);
+				GL.Enable(EnableCap.DepthTest);
 			};
 
 			Window.UpdateFrame += delegate(object target, FrameEventArgs args)
@@ -55,7 +56,7 @@ namespace Firefly2
 
 			Window.RenderFrame += delegate
 			{
-				GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.StencilBufferBit);
+				GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.StencilBufferBit | ClearBufferMask.DepthBufferBit);
 
 				//RENDER
 				Renderer.Render();

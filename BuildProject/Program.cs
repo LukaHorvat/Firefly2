@@ -1,6 +1,7 @@
 ﻿using Firefly2;
 using Firefly2.Components;
 using Firefly2.Facilities;
+using Firefly2.Messages;
 using Firefly2.Messages.Querying;
 using Firefly2.Utility;
 using OpenTK;
@@ -21,49 +22,27 @@ namespace BuildProject
 		{
 			var stage = new Stage(800, 500, "Hello World");
 
-			var circle = new Entity{
-				new RenderBufferComponent(),
-				new TransformComponent(),
-				new GeometryComponent(),
-				new ShapeColorComponent(),
-				new TreeNodeComponent()
-			};
+			var rec1 = new Rectangle(100, 100, Color.HSVToRGB(0, 0.7, 1, 1));
+			var rec2 = new Rectangle(100, 100, Color.HSVToRGB(90, 0.7, 1, 1));
+			stage.TreeNode.AddChild(rec1);
+			stage.TreeNode.AddChild(rec2);
+			rec1.Transform.Z = -0.5;
+			rec2.Transform.Z = -1;
 
-			for (int i = 0; i <= 361; ++i)
+			double acc = 0;
+			stage.Update.AfterUpdate += delegate(AfterUpdateMessage msg)
 			{
-				circle.GetComponent<GeometryComponent>().Add(new Vector2d(Math.Cos(i / 180F * Math.PI) * 200, Math.Sin(i / 180F * Math.PI) * 200));
-				circle.GetComponent<ShapeColorComponent>().Add(Color.HSVToRGB(i, 1, 1, 1));
-			}
-			circle.GetComponent<GeometryComponent>().Add(new Vector2d(0, 0));
-			circle.GetComponent<ShapeColorComponent>().Add(Color.HSVToRGB(0, 0, 0, 1));
-			stage.TreeNode.AddChild(circle);
+				acc += msg.DeltaTime;
+				rec1.Transform.X = Math.Cos(acc) * 200;
+				rec1.Transform.Z = Math.Sin(acc);
+				rec1.Transform.ScaleX = rec1.Transform.ScaleY = 1 / (rec1.Transform.Z + 2);
+
+				rec2.Transform.X = Math.Cos(acc + Math.PI) * 200;
+				rec2.Transform.Z = Math.Sin(acc + Math.PI);
+				rec2.Transform.ScaleX = rec2.Transform.ScaleY = 1 / (rec2.Transform.Z + 2);
+			};
 
 			stage.Run();
-		}
-
-		static Entity MakeRectangle(Renderer renderer, MutableVector2 mouse)
-		{
-			return new Entity
-			{
-				new GeometryComponent
-				{
-					new Vector2d(0, 0),
-					new Vector2d(200, 0),
-					new Vector2d(200, 100),
-					new Vector2d(0, 100)
-				},
-				new ShapeColorComponent
-				{
-					new Vector4(1, 0, 0, 1),
-					new Vector4(0, 1, 0, 1),
-					new Vector4(0, 0, 1, 1),
-					new Vector4(1, 1, 0, 1)
-				},
-				new RenderBufferComponent(renderer),
-				new TreeNodeComponent(),
-				new TransformComponent(),
-				new MouseInteractionComponent(mouse)
-			};
 		}
 	}
 }

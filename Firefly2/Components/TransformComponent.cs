@@ -16,18 +16,19 @@ namespace Firefly2.Components
 	{
 		private class TransformState
 		{
-			public double ScaleX = 1, ScaleY = 1, X = 0, Y = 0, Rotation = 0;
+			public double ScaleX = 1, ScaleY = 1, X = 0, Y = 0, Z = 1, Rotation = 0;
 
 			public bool TryUpdate(TransformComponent comp)
 			{
 				if (ScaleX != comp.ScaleX || ScaleY != comp.ScaleY ||
-					X != comp.X || Y != comp.Y ||
+					X != comp.X || Y != comp.Y || Z != comp.Z ||
 					Rotation != comp.Rotation)
 				{
 					ScaleX = comp.ScaleX;
 					ScaleY = comp.ScaleY;
 					X = comp.X;
 					Y = comp.Y;
+					Z = comp.Z;
 					Rotation = comp.Rotation;
 					return true;
 				}
@@ -39,7 +40,7 @@ namespace Firefly2.Components
 				Matrix4 scale, rotation, translation, scaleRotation, total;
 				scale = Matrix4.CreateScale((float)ScaleX, (float)ScaleY, 1);
 				rotation = Matrix4.CreateRotationZ((float)Rotation);
-				translation = Matrix4.CreateTranslation((float)X, (float)Y, 0);
+				translation = Matrix4.CreateTranslation((float)X, (float)Y, (float)Z);
 				Matrix4.Mult(ref scale, ref rotation, out scaleRotation);
 				Matrix4.Mult(ref scaleRotation, ref translation, out total);
 				return total;
@@ -55,7 +56,7 @@ namespace Firefly2.Components
 		private Uplink<TransformComponent> uplink;
 
 		public short ObjectIndex = -1;
-		public double ScaleX = 1, ScaleY = 1, X = 0, Y = 0, Rotation = 0;
+		public double ScaleX = 1, ScaleY = 1, X = 0, Y = 0, Z = 0, Rotation = 0;
 		public Matrix4 ModelMatrix;
 
 		public TransformComponent()

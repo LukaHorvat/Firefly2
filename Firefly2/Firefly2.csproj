@@ -67,6 +67,7 @@
     <Compile Include="Facilities\Renderer.cs" />
     <Compile Include="Facilities\ShaderProgramInfo.cs" />
     <Compile Include="Geometry\Triangle.cs" />
+    <Compile Include="Geometry\TriangulationVertex.cs" />
     <Compile Include="Geometry\VertexData.cs" />
     <Compile Include="ITakesMessage.cs" />
     <Compile Include="IAnswersMessage.cs" />
