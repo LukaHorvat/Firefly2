@@ -3,6 +3,7 @@ using Firefly2.Components;
 using Firefly2.Facilities;
 using Firefly2.Messages;
 using Firefly2.Messages.Querying;
+using Firefly2.Physics;
 using Firefly2.Utility;
 using OpenTK;
 using System;
@@ -21,25 +22,23 @@ namespace BuildProject
 		static void Main(string[] args)
 		{
 			var stage = new Stage(800, 500, "Hello World");
+			stage.TreeNode.AddChild(PhysicalSettings.Default);
 
-			var rec1 = new Rectangle(100, 100, Color.HSVToRGB(0, 0.7, 1, 1));
-			var rec2 = new Rectangle(100, 100, Color.HSVToRGB(90, 0.7, 1, 1));
-			stage.TreeNode.AddChild(rec1);
+			var rec = new Rectangle(100, 100, new Vector4(1, 0, 0, 1));
+			rec.Transform.Y = 100;
+			rec.AddComponent<PhysicsComponent>();
+			var rec2 = new Rectangle(100, 100, new Vector4(1, 1, 0, 1));
+			rec2.Transform.Y = 0;
+			rec2.AddComponent<PhysicsComponent>();
+
+			rec.GetComponent<PhysicsComponent>().AddJoint(rec2, new Vector2d(0, -50), new Vector2d(0, 50));
+
+			stage.TreeNode.AddChild(rec);
 			stage.TreeNode.AddChild(rec2);
-			rec1.Transform.Z = -0.5;
-			rec2.Transform.Z = -1;
 
-			double acc = 0;
-			stage.Update.AfterUpdate += delegate(AfterUpdateMessage msg)
+			stage.Update.AfterUpdate+= delegate
 			{
-				acc += msg.DeltaTime;
-				rec1.Transform.X = Math.Cos(acc) * 200;
-				rec1.Transform.Z = Math.Sin(acc);
-				rec1.Transform.ScaleX = rec1.Transform.ScaleY = 1 / (rec1.Transform.Z + 2);
-
-				rec2.Transform.X = Math.Cos(acc + Math.PI) * 200;
-				rec2.Transform.Z = Math.Sin(acc + Math.PI);
-				rec2.Transform.ScaleX = rec2.Transform.ScaleY = 1 / (rec2.Transform.Z + 2);
+				rec.GetComponent<PhysicsComponent>().ApplyForce(new Vector2d(1, 0), new Vector2d(0, 0));
 			};
 
 			stage.Run();

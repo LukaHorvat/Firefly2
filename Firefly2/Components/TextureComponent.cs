@@ -1,5 +1,4 @@
 ﻿using Firefly2.Messages;
-using Firefly2.OGLObjects;
 using OpenTK;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ namespace Firefly2.Components
 {
 	public class TextureComponent : Component
 	{
-		public Texture Texture;
+		//public Texture Texture;
 		public ObservableCollection<Vector2> TexCoords;
 
 		public TextureComponent()

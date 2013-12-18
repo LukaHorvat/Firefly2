@@ -48,6 +48,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithm\Comparing.cs" />
+    <Compile Include="Algorithm\RectanglePacking.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="Components\GeometryComponent.cs" />
     <Compile Include="Components\MouseInteractionComponent.cs" />
@@ -66,9 +68,11 @@
     <Compile Include="Facilities\Link.cs" />
     <Compile Include="Facilities\Renderer.cs" />
     <Compile Include="Facilities\ShaderProgramInfo.cs" />
+    <Compile Include="Geometry\AARectangle.cs" />
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="Geometry\TriangulationVertex.cs" />
     <Compile Include="Geometry\VertexData.cs" />
+    <Compile Include="Graphics\Texture.cs" />
     <Compile Include="ITakesMessage.cs" />
     <Compile Include="IAnswersMessage.cs" />
     <Compile Include="Messages\AddedToEntity.cs" />
@@ -88,7 +92,6 @@
     <Compile Include="Messages\StopRendering.cs" />
     <Compile Include="Messages\TexCoordsChanged.cs" />
     <Compile Include="Messages\UpdateMessage.cs" />
-    <Compile Include="OGLObjects\Texture.cs" />
     <Compile Include="Stage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\BinaryTree.cs" />
@@ -96,13 +99,13 @@
     <Compile Include="Utility\Debug.cs" />
     <Compile Include="Utility\Extensions.cs" />
     <Compile Include="Utility\Geometry.cs" />
+    <Compile Include="Utility\ImmutableVector2.cs" />
+    <Compile Include="Utility\LinkedMatrix.cs" />
     <Compile Include="Utility\MutableVector2.cs" />
     <Compile Include="Utility\PriorityQueue.cs" />
-    <Compile Include="Utility\Triangulation.cs" />
+    <Compile Include="Algorithm\Triangulation.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Templating\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>

@@ -10,3 +10,8 @@ C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\obj\De
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\OpenTK.pdb
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\OpenTK.xml
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\Triangle.dll
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\Firefly2.Physics.dll
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\FarseerPhysics.dll
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\Firefly2.Physics.pdb
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\FarseerPhysics.pdb
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\FarseerPhysics.xml

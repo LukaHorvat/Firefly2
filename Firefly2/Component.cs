@@ -15,9 +15,5 @@ namespace Firefly2
 		{
 			Name = this.GetType().Name;
 		}
-
-		public virtual void OnComponent(Component component) { }
-
-		public virtual void OnComponentRemoval(Component component) { }
 	}
 }

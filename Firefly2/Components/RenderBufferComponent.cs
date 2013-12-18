@@ -1,7 +1,7 @@
-﻿using Firefly2.Facilities;
+﻿using Firefly2.Algorithm;
+using Firefly2.Facilities;
 using Firefly2.Geometry;
 using Firefly2.Messages;
-using Firefly2.Utility;
 using OpenTK;
 using System;
 using System.Collections.Generic;
@@ -211,6 +211,7 @@ namespace Firefly2.Components
 
 		public void TakeMessage(TransformationChanged msg)
 		{
+			if (Renderer == null) return;
 			var newIndex = Renderer.ProcessTransform(this, Host.GetComponent<TransformComponent>().ModelMatrix);
 			if (transformIndex != newIndex)
 			{

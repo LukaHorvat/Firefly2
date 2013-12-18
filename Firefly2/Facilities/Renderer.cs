@@ -43,7 +43,7 @@ namespace Firefly2.Facilities
 			GL.LinkProgram(ShaderProgram);
 
 			window = GL.GetUniformLocation(ShaderProgram, "window");
-			WindowMatrix = Matrix4.CreateScale(2F / width, -2F / height, 1);
+			WindowMatrix = Matrix4.CreateScale(2F / width, 2F / height, 1);
 
 			shaderInfo = new ShaderProgramInfo
 			{

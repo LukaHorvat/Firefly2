@@ -11,7 +11,7 @@ namespace Firefly2.Facilities
 		public static string VertexShaderSource = @"
 #version 140
 
-uniform samplerBuffer buffer;
+uniform samplerBuffer objectBuffer;
 uniform mat4 camera;
 uniform mat4 window;
 
@@ -25,7 +25,7 @@ out vec2 fragment_texcoords;
 
 vec2 getRow(int offset)
 {
-	return vec2(texelFetch(buffer, offset).x, texelFetch(buffer, offset + 1).x);
+	return vec2(texelFetch(objectBuffer, offset).x, texelFetch(objectBuffer, offset + 1).x);
 }
 
 mat2 getMatrix(int offset)
@@ -40,7 +40,7 @@ vec2 getPosition(int offset)
 
 float get(int offset)
 {
-	return texelFetch(buffer, offset).x;
+	return texelFetch(objectBuffer, offset).x;
 }
 
 void main()

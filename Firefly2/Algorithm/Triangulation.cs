@@ -9,9 +9,9 @@ using TriangleNet;
 using TriangleNet.Data;
 using TriangleNet.Geometry;
 
-namespace Firefly2.Utility
+namespace Firefly2.Algorithm
 {
-	internal class Triangulation
+	internal static class Triangulation
 	{
 		public static List<Triangle<VertexData>> Triangulate(IList<VertexData> points)
 		{
@@ -19,9 +19,9 @@ namespace Firefly2.Utility
 			var geom = new InputGeometry();
 			points.ForEach((point, index) =>
 			{
-				//We use the boundary parameter as an index so we can later attach VertexData to
-				//each vertex
+				//Bypass the default add method so we can insert our own vertices
 				(geom.Points as List<Vertex>).Add(new TriangulationVertex(point));
+				geom.Bounds.Update(point.Coordinates.X, point.Coordinates.Y);
 				geom.AddSegment(index, (index + 1) % points.Count);
 			});
 			mesh.Triangulate(geom);
