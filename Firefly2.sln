@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildProject", "BuildProjec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firefly2.Physics", "Firefly2.Physics\Firefly2.Physics.csproj", "{FF1011CA-58AB-4118-B276-6632B992D50C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperSpaceGame", "..\SuperSpaceGame\SuperSpaceGame\SuperSpaceGame.csproj", "{F8388C4E-1065-42E6-94D6-FEB0E342FF26}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{FF1011CA-58AB-4118-B276-6632B992D50C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF1011CA-58AB-4118-B276-6632B992D50C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF1011CA-58AB-4118-B276-6632B992D50C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8388C4E-1065-42E6-94D6-FEB0E342FF26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8388C4E-1065-42E6-94D6-FEB0E342FF26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8388C4E-1065-42E6-94D6-FEB0E342FF26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8388C4E-1065-42E6-94D6-FEB0E342FF26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

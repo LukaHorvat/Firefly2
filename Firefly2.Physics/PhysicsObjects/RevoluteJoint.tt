@@ -1,0 +1,51 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System" #>
+<#@ assembly name="$(ProjectDir)bin\Debug\FarseerPhysics.dll" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Reflection" #>
+
+<#@ output extension=".cs" #>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Firefly2.Physics.PhysicsObjects
+{
+	public class RevoluteJoint
+	{
+		private FarseerPhysics.Dynamics.Joints.RevoluteJoint joint;
+
+		<#
+			var members = typeof(FarseerPhysics.Dynamics.Joints.RevoluteJoint).GetMembers();
+			for (int i = 0; i < members.Length; ++i)
+			{
+				if (members[i].MemberType == MemberTypes.Field)
+				{
+					var field = (FieldInfo)members[i];
+					if (field.FieldType == typeof(Microsoft.Xna.Framework.Vector2))
+					{
+						WriteLine(field.FieldType.ToString());
+					}
+				}
+				if (members[i].MemberType == MemberTypes.Property)
+				{
+					var prop = (PropertyInfo)members[i];
+					if (prop.PropertyType == typeof(Microsoft.Xna.Framework.Vector2))
+					{
+						WriteLine(prop.PropertyType.ToString());
+					}
+				}
+			}
+		#>
+
+		public RevoluteJoint(FarseerPhysics.Dynamics.Joints.RevoluteJoint joint)
+		{
+			this.joint = joint;
+		}
+	}
+}

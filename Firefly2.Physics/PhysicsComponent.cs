@@ -16,7 +16,8 @@ using System.Threading.Tasks;
 namespace Firefly2.Physics
 {
 	public class PhysicsComponent : Component, ITakesMessage<UpdateMessage>,
-											ITakesMessage<ComponentCollectionChanged>
+											ITakesMessage<ComponentCollectionChanged>,
+											ITakesMessage<GeometryChanged>
 	{
 		private Body body;
 		private List<Fixture> fixtures;
@@ -29,6 +30,50 @@ namespace Firefly2.Physics
 			get { return density; }
 			set { density = value; UpdateBody(); }
 		}
+		/// <summary>
+		/// Get the location of the center of mass in local coordinates relative to this entity
+		/// </summary>
+		public Vector2d CenterOfMass
+		{
+			get
+			{
+				if (body == null) return Vector2d.Zero;
+				return VectorConversion.Convert(body.LocalCenter * WorldSettings.UnitsPerMeter);
+			}
+		}
+		/// <summary>
+		/// Get or set the position of the body.
+		/// </summary>
+		public Vector2d BodyPosition
+		{
+			get
+			{
+				if (body == null) return Vector2d.Zero;
+				return VectorConversion.Convert(body.Position * WorldSettings.UnitsPerMeter);
+			}
+			set
+			{
+				if (body == null) return;
+				body.SetTransform(VectorConversion.Convert(value * WorldSettings.MetersPerUnit), body.Rotation);
+			}
+		}
+		/// <summary>
+		/// Get or set the rotation of the body.
+		/// </summary>
+		public double BodyRotation
+		{
+			get
+			{
+				if (body == null) return 0;
+				return body.Rotation;
+			}
+			set
+			{
+				if (body == null) return;
+				body.SetTransform(body.Position, (float)value);
+			}
+		}
+
 
 		public PhysicsComponent() : this(PhysicalSettings.Default) { }
 
@@ -45,10 +90,40 @@ namespace Firefly2.Physics
 			}
 		}
 
+		public void ApplyForce(Vector2d force)
+		{
+			if (body != null)
+			{
+				body.ApplyForce(VectorConversion.Convert(force));
+			}
+		}
+
+		public Vector2d GetLocal(Vector2d global)
+		{
+			if (body == null) return Vector2d.Zero;
+			return VectorConversion.Convert(
+				body.GetLocalPoint(
+					VectorConversion.Convert(global * WorldSettings.MetersPerUnit) * WorldSettings.UnitsPerMeter
+				)
+			);
+		}
+
+		public Vector2d GetGlobal(Vector2d local)
+		{
+			if (body == null) return Vector2d.Zero;
+			return VectorConversion.Convert(
+				body.GetWorldPoint(
+					VectorConversion.Convert(local * WorldSettings.MetersPerUnit)
+				) * WorldSettings.UnitsPerMeter
+			);
+		}
+
 		public void AddJoint(Entity secondBody, Vector2d selfAnchor, Vector2d foreignAnchor)
 		{
+			if (body == null) throw new InvalidOperationException("Body is null");
 			var phys = secondBody.GetComponent<PhysicsComponent>();
-			if (phys == null) throw new InvalidOperationException("Second body doesn't have a PhysicsComponent");
+			if (phys == null) throw new InvalidOperationException("Second entity doesn't have a PhysicsComponent");
+			if (phys.body == null) throw new InvalidOperationException("Second PhysicsComponent doesn't have a body");
 			WorldSettings.World.AddJoint(
 				new RevoluteJoint(
 					body,
@@ -56,6 +131,13 @@ namespace Firefly2.Physics
 					VectorConversion.Convert(selfAnchor * WorldSettings.MetersPerUnit),
 					VectorConversion.Convert(foreignAnchor * WorldSettings.MetersPerUnit)
 				)
+				{
+					MotorEnabled = true,
+					MaxMotorTorque = 1,
+					LimitEnabled = true,
+					LowerLimit = 0,
+					UpperLimit = 0
+				}
 			);
 		}
 
@@ -77,6 +159,11 @@ namespace Firefly2.Physics
 			}
 		}
 
+		public void TakeMessage(GeometryChanged msg)
+		{
+			UpdateBody();
+		}
+
 		public void TakeMessage(UpdateMessage msg)
 		{
 			TransformComponent transform;
@@ -92,11 +179,14 @@ namespace Firefly2.Physics
 		private void UpdateBody()
 		{
 			if (Host.GetComponent<GeometryComponent>() == null ||
-				Host.GetComponent<TransformComponent>() == null) return;
+				Host.GetComponent<TransformComponent>() == null ||
+				Host.GetComponent<GeometryComponent>().Polygon.Count == 0) return;
 
 			ClearBody();
 			var geometry = Host.GetComponent<GeometryComponent>();
 			var transform = Host.GetComponent<TransformComponent>();
+
+			if (geometry.Polygon.Count < 3) return;
 
 			body = BodyFactory.CreateBody(WorldSettings.World);
 			fixtures = new List<Fixture>();
