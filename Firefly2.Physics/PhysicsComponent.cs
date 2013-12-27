@@ -74,6 +74,40 @@ namespace Firefly2.Physics
 			}
 		}
 
+		/// <summary>
+		/// Get or set the velocity of the body.
+		/// </summary>
+		public Vector2d BodyVelocity
+		{
+			get
+			{
+				if (body == null) return Vector2d.Zero;
+				return VectorConversion.Convert(body.LinearVelocity * WorldSettings.UnitsPerMeter);
+			}
+			set
+			{
+				if (body == null) return;
+				body.LinearVelocity = VectorConversion.Convert(value * WorldSettings.MetersPerUnit);
+			}
+		}
+
+		/// <summary>
+		/// Get or set the angular velocity of the body.
+		/// </summary>
+		public double BodyAngularVelocity
+		{
+			get
+			{
+				if (body == null) return 0;
+				return body.AngularVelocity;
+			}
+			set
+			{
+				if (body == null) return;
+				body.AngularVelocity = (float)value;
+			}
+		}
+
 
 		public PhysicsComponent() : this(PhysicalSettings.Default) { }
 
@@ -118,27 +152,30 @@ namespace Firefly2.Physics
 			);
 		}
 
-		public void AddJoint(Entity secondBody, Vector2d selfAnchor, Vector2d foreignAnchor)
+		public Firefly2.Physics.PhysicsObjects.RevoluteJoint AddJoint(Entity secondBody, Vector2d selfAnchor, Vector2d foreignAnchor)
 		{
 			if (body == null) throw new InvalidOperationException("Body is null");
 			var phys = secondBody.GetComponent<PhysicsComponent>();
 			if (phys == null) throw new InvalidOperationException("Second entity doesn't have a PhysicsComponent");
 			if (phys.body == null) throw new InvalidOperationException("Second PhysicsComponent doesn't have a body");
+			var joint = new RevoluteJoint
+			(
+				body,
+				phys.body,
+				VectorConversion.Convert(selfAnchor * WorldSettings.MetersPerUnit),
+				VectorConversion.Convert(foreignAnchor * WorldSettings.MetersPerUnit)
+			)
+			{
+				MotorEnabled = true,
+				MaxMotorTorque = 1,
+				//LimitEnabled = true,
+				//LowerLimit = 0,
+				//UpperLimit = 0
+			};
 			WorldSettings.World.AddJoint(
-				new RevoluteJoint(
-					body,
-					phys.body,
-					VectorConversion.Convert(selfAnchor * WorldSettings.MetersPerUnit),
-					VectorConversion.Convert(foreignAnchor * WorldSettings.MetersPerUnit)
-				)
-				{
-					MotorEnabled = true,
-					MaxMotorTorque = 1,
-					LimitEnabled = true,
-					LowerLimit = 0,
-					UpperLimit = 0
-				}
+				joint
 			);
+			return new Firefly2.Physics.PhysicsObjects.RevoluteJoint(joint, WorldSettings);
 		}
 
 		public void TakeMessage(ComponentCollectionChanged msg)

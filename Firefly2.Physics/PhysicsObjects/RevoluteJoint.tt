@@ -6,46 +6,99 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Reflection" #>
-
 <#@ output extension=".cs" #>
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Firefly2.Physics;
+using OpenTK;
 
 namespace Firefly2.Physics.PhysicsObjects
 {
 	public class RevoluteJoint
 	{
 		private FarseerPhysics.Dynamics.Joints.RevoluteJoint joint;
+		private PhysicalSettings settings;
 
 		<#
 			var members = typeof(FarseerPhysics.Dynamics.Joints.RevoluteJoint).GetMembers();
 			for (int i = 0; i < members.Length; ++i)
 			{
-				if (members[i].MemberType == MemberTypes.Field)
+				if (members[i].MemberType == MemberTypes.Field || members[i].MemberType == MemberTypes.Property)
 				{
-					var field = (FieldInfo)members[i];
-					if (field.FieldType == typeof(Microsoft.Xna.Framework.Vector2))
-					{
-						WriteLine(field.FieldType.ToString());
+					var field = members[i] as FieldInfo;
+					var prop = members[i] as PropertyInfo;
+					var type = field != null ? field.FieldType : prop.PropertyType;
+					var name = field != null ? field.Name : prop.Name;
+					bool canSet = field != null || prop.CanWrite;
+					if (type == typeof(Microsoft.Xna.Framework.Vector2))
+					{#>
+
+		public Vector2d <#=name#> 
+		{ 
+			get 
+			{ 
+				return VectorConversion.Convert(joint.<#=name#> * settings.UnitsPerMeter);
+			}
+			set
+			{
+				joint.<#=name#> = VectorConversion.Convert(value * settings.MetersPerUnit);
+			}
+		}
+					<#
 					}
-				}
-				if (members[i].MemberType == MemberTypes.Property)
-				{
-					var prop = (PropertyInfo)members[i];
-					if (prop.PropertyType == typeof(Microsoft.Xna.Framework.Vector2))
-					{
-						WriteLine(prop.PropertyType.ToString());
+					if (type == typeof(float)) 
+					{#>
+
+		public double <#=name#>
+		{
+			get
+			{
+				return joint.<#=name#>;
+			}<#			if (canSet) 
+						{#>
+
+			set
+			{
+				joint.<#=name#> = (float)value;
+			}
+						<#
+						}#>
+
+		}
+					<#
+					}
+					if (new []{typeof(bool), typeof(int)}.Contains(type)) 
+					{#>
+
+		public <#=type#> <#=name#>
+		{
+			get
+			{
+				return joint.<#=name#>;
+			}<#			if (canSet) 
+						{#>
+
+			set
+			{
+				joint.<#=name#> = value;
+			}
+						<#
+						}#>
+
+		}
+					<#
 					}
 				}
 			}
 		#>
 
-		public RevoluteJoint(FarseerPhysics.Dynamics.Joints.RevoluteJoint joint)
+		public RevoluteJoint(FarseerPhysics.Dynamics.Joints.RevoluteJoint joint, PhysicalSettings settings)
 		{
 			this.joint = joint;
+			this.settings = settings;
 		}
 	}
 }
