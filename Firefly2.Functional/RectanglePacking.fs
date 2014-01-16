@@ -57,5 +57,3 @@ module Packer =
         let ordered = List.sortBy (fun (rect: IRectangle) -> -(rect.Width * rect.Height)) rectangles
         putRectangles ordered initialSpots
         ordered
-
-        
