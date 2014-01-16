@@ -6,3 +6,6 @@ C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\obj\Debug\
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\obj\Debug\Firefly2.pdb
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\bin\Debug\OpenTK.pdb
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\bin\Debug\OpenTK.xml
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\bin\Debug\Firefly2.Functional.dll
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\bin\Debug\Firefly2.Functional.pdb
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\Firefly2\bin\Debug\Firefly2.Functional.xml

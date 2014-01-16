@@ -22,10 +22,10 @@ namespace BuildProject
 			AddComponent<TreeNodeComponent>();
 			AddComponent(new GeometryComponent
 			{
-				new Vector2d(-width / 2, -height / 2), 
-				new Vector2d( width / 2, -height / 2),
-				new Vector2d( width / 2,  height / 2),
-				new Vector2d(-height / 2, height / 2)
+				new Vector2d(0, 0), 
+				new Vector2d(width, 0),
+				new Vector2d(width, height),
+				new Vector2d(0, height)
 			});
 			AddComponent(new ShapeColorComponent
 			{

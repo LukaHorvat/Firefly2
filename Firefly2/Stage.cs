@@ -17,7 +17,6 @@ namespace Firefly2
 	{
 		public Renderer Renderer;
 		public GameWindow Window;
-		public Action<Vector2d> temp;
 
 		[Shorthand]
 		public TreeNodeComponent TreeNode { get; set; }
@@ -46,7 +45,6 @@ namespace Firefly2
 				var afterUpdateMessage = new AfterUpdateMessage(args.Time);
 				Window.Title = Window.UpdateFrequency + ", " + Window.RenderFrequency;
 
-				if (temp != null) temp(new Vector2d(Window.Mouse.X - Window.Width / 2, Window.Mouse.Y - Window.Height / 2));
 				TreeNode.Send(updateMessage, TreeNodeComponent.SendRange.WholeTree);
 				Update.TakeMessage(updateMessage);
 				TreeNode.Send(afterUpdateMessage, TreeNodeComponent.SendRange.WholeTree);

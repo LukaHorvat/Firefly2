@@ -268,8 +268,29 @@ namespace Firefly2.Utility
 			get { return new LinkedMatrixView<T1>(dict, Row, Column); }
 		}
 
+		public LinkedMatrixNode<T1> Left
+		{
+			get { return new LinkedMatrixNode<T1>(dict, Row, Column.Previous); }
+		}
+
+		public LinkedMatrixNode<T1> Right
+		{
+			get { return new LinkedMatrixNode<T1>(dict, Row, Column.Next); }
+		}
+
+		public LinkedMatrixNode<T1> Up
+		{
+			get { return new LinkedMatrixNode<T1>(dict, Row.Previous, Column); }
+		}
+
+		public LinkedMatrixNode<T1> Down
+		{
+			get { return new LinkedMatrixNode<T1>(dict, Row.Next, Column); }
+		}
+
 		internal LinkedMatrixNode(MatrixLookup<T1> dict, LinkedListNode<int> row, LinkedListNode<int> column)
 		{
+			if (row == null || column == null) throw new InvalidOperationException("Matrix node out of bounds.");
 			this.Row = row;
 			this.Column = column;
 			this.dict = dict;

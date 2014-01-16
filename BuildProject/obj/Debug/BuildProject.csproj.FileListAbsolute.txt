@@ -15,3 +15,6 @@ C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\De
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\Firefly2.Physics.pdb
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\FarseerPhysics.pdb
 C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\FarseerPhysics.xml
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\Firefly2.Functional.dll
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\Firefly2.Functional.pdb
+C:\Users\Luka\Documents\Visual Studio 2012\Projects\Firefly2\BuildProject\bin\Debug\Firefly2.Functional.xml
