@@ -88,15 +88,19 @@ namespace Firefly2.Algorithm
 			rectangles.ForEach(rect =>
 				newRects.Add(new PackedRectangle(new AARectangle(Vector2d.Zero, rect.Rectangle.Size), rect.Id))
 			);
+			PackRectanglesModifyFSharp(newRects);
+
+			return newRects;
+		}
+
+		public static void PackRectanglesModifyFSharp(List<PackedRectangle> rectangles)
+		{
 			var list =
 			ListModule.OfSeq<IRectangle>
 			(
-				newRects.Select(r => new FSharpRectangle(r))
+				rectangles.Select(r => new FSharpRectangle(r))
 			);
-			var packed = Packer.packRectangles(list);
-
-
-			return packed.Select(r => (r as FSharpRectangle).PackedRect).ToList();
+			Packer.packRectangles(list);
 		}
 
 		/// <summary>

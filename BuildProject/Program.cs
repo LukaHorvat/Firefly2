@@ -31,69 +31,30 @@ namespace BuildProject
 			stage.TreeNode.AddChild(world);
 
 			world.AddComponent<CameraComponent>();
-			world.GetComponent<CameraComponent>().LookAt(400, 250);
-			int number = 0;
 
-			List<PackedRectangle> packed = null, packed2 = null;
-			var rand = new Random(1000);
-			var rects = new List<PackedRectangle>();
-			number = 200;
-			for (int i = 0; i < number; ++i)
-			{
-				rects.Add
-				(
-					new PackedRectangle
-					(
-						new Firefly2.Geometry.AARectangle
-						(
-							new Vector2d(0, 0),
-							new Vector2d(rand.Next(20) + 60, rand.Next(20) + 60)
-						),
-						i
-					)
-				);
-			}
-			packed = RectanglePacking.PackRectangles(rects);
-			packed2 = RectanglePacking.PackRectanglesFSharp(rects);
-			packed = packed2;
+			var picture = new Rectangle(100, 100, Color.HSVToRGB(90, 0, 0, 0));
+			picture.AddComponent<TextureComponent>();
+			picture.GetComponent<TextureComponent>().TexCoords.AddMany(
+				new Vector2(0, 0),
+				new Vector2(1, 0),
+				new Vector2(1, 1),
+				new Vector2(0, 1)
+			);
+			picture.GetComponent<TextureComponent>().UpdateBitmap(new System.Drawing.Bitmap("EdibleAnus.png"));
 
-			//for (int i = 0; i < number; ++i)
-			//{
-			//	if (packed[i].Rectangle.Position != packed2[i].Rectangle.Position)
-			//	{
-			//		Debugger.Break();
-			//	}
-			//}
+			var fish = new Rectangle(100, 100, Color.HSVToRGB(90, 0, 0, 0));
+			fish.AddComponent<TextureComponent>();
+			fish.GetComponent<TextureComponent>().TexCoords.AddMany(
+				new Vector2(0, 0),
+				new Vector2(1, 0),
+				new Vector2(1, 1),
+				new Vector2(0, 1)
+			);
+			fish.GetComponent<TextureComponent>().UpdateBitmap(new System.Drawing.Bitmap("BetaFish.jpg"));
+			fish.Transform.X = 100;
 
-			int count = 0;
-			bool spaceDown = false;
-			stage.Update.Update += delegate
-			{
-				var keyboard = OpenTK.Input.Keyboard.GetState();
-				if (keyboard.IsKeyDown(Key.Space))
-				{
-					spaceDown = true;
-				}
-				if (keyboard.IsKeyUp(Key.Space))
-				{
-					if (spaceDown)
-					{
-						if (packed.Count == count) return;
-						var rect = packed[count];
-						var displayRect = new Rectangle
-						(
-							(float)rect.Rectangle.Size.X,
-							(float)rect.Rectangle.Size.Y,
-							Color.HSVToRGB(0, 0.5, 0.7F / number * count + 0.3F, 1)
-						);
-						displayRect.Transform.X = rect.Rectangle.Position.X;
-						displayRect.Transform.Y = rect.Rectangle.Position.Y;
-						world.GetComponent<TreeNodeComponent>().AddChild(displayRect);
-						count++;
-						spaceDown = false;
-					}
-				}
-			};
+			world.GetComponent<TreeNodeComponent>().AddChild(picture);
+			world.GetComponent<TreeNodeComponent>().AddChild(fish);
 
 			stage.Run();
 		}

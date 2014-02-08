@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,5 +45,15 @@ public static class Extensions
 		T obj;
 		reference.TryGetTarget(out obj);
 		return obj;
+	}
+
+	public static System.Drawing.Point ToDrawingPoint(this OpenTK.Vector2d vec)
+	{
+		return new System.Drawing.Point((int)vec.X, (int)vec.Y);
+	}
+
+	public static void AddMany<T>(this ObservableCollection<T> collection, params T[] elements)
+	{
+		foreach (var element in elements) collection.Add(element);
 	}
 }

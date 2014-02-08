@@ -55,7 +55,6 @@ namespace Firefly2.Components
 		}
 		private Uplink<TransformComponent> uplink;
 
-		public short ObjectIndex = -1;
 		public double ScaleX = 1, ScaleY = 1, X = 0, Y = 0, Z = 0, Rotation = 0;
 		public Matrix4 ModelMatrix;
 

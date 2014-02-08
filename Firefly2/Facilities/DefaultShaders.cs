@@ -45,19 +45,26 @@ float get(int offset)
 
 void main()
 {
-	int i = int(index * 32768) * 7;
+	int i = int(index * 32768) * " + Layer.ElementsPerObject + @";
 	mat4 model = mat4(	vec4(get(i), get(i + 1), 0, 0),
 						vec4(get(i + 2), get(i + 3), 0, 0),
 						vec4(0, 0, 1, 0),
 						vec4(get(i + 4), get(i + 5), get(i + 6), 1));
+	vec4 object_texture = vec4(get(i + 7), get(i + 8), get(i + 9), get(i + 10));
+	vec2 actual_texcoords = vec2(
+		object_texture.x + (object_texture.z - object_texture.x) * vertex_texcoords.x,
+		object_texture.y + (object_texture.w - object_texture.y) * vertex_texcoords.y
+	);
 
 	fragment_color = vertex_color;
-	fragment_texcoords = vertex_texcoords;
+	fragment_texcoords = actual_texcoords;
 	gl_Position = window * model * vec4(vertex_position, 0.0, 1.0);
 }
 ";
 		public static string FragmentShaderSource = @"
 #version 140
+
+uniform sampler2D atlas;
 
 in vec4 fragment_color;
 in vec2 fragment_texcoords;
@@ -66,8 +73,9 @@ out vec4 final_color;
 
 void main()
 {
+	final_color = texture(atlas, fragment_texcoords) + fragment_color;
 	//final_color = vec4(fragment_texcoords, 1.0, 1.0);
-	final_color = fragment_color;
+	//final_color = fragment_color;
 }
 ";
 	}

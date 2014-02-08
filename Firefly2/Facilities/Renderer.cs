@@ -3,6 +3,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,6 +55,7 @@ namespace Firefly2.Facilities
 				VertexTexCoords = GL.GetAttribLocation(ShaderProgram, "vertex_texcoords"),
 				VertexIndex = GL.GetAttribLocation(ShaderProgram, "index"),
 				TexBuffer = GL.GetUniformLocation(ShaderProgram, "buffer"),
+				Atlas = GL.GetUniformLocation(ShaderProgram, "atlas"),
 				WindowLocation = window
 			};
 
@@ -89,6 +91,16 @@ namespace Firefly2.Facilities
 		public void RemoveTransform(RenderBufferComponent renderBuffer)
 		{
 			GetLayer("default").RemoveTransform(renderBuffer);
+		}
+
+		public short ProcessTexture(RenderBufferComponent renderBuffer, Bitmap bmp)
+		{
+			return GetLayer("default").ModifyOrAddTexture(renderBuffer, bmp);
+		}
+
+		public void RemoveTexture(RenderBufferComponent renderBuffer)
+		{
+			throw new NotImplementedException();
 		}
 
 		public void Render()

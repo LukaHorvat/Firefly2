@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TexLib;
 
 namespace Firefly2
 {
@@ -37,6 +38,7 @@ namespace Firefly2
 			{
 				GL.ClearColor(Color4.Black);
 				GL.Enable(EnableCap.DepthTest);
+				TexUtil.InitTexturing();
 			};
 
 			Window.UpdateFrame += delegate(object target, FrameEventArgs args)

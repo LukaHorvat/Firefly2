@@ -5,6 +5,7 @@ using Firefly2.Messages;
 using OpenTK;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ namespace Firefly2.Components
 	public class RenderBufferComponent : Component, ITakesMessage<GeometryChanged>,
 													ITakesMessage<ShapeColorChanged>,
 													ITakesMessage<TexCoordsChanged>,
+													ITakesMessage<TextureChanged>,
 													ITakesMessage<TransformationChanged>,
 													ITakesMessage<RendererChanged>,
 													ITakesMessage<AfterUpdateMessage>,
@@ -30,6 +32,7 @@ namespace Firefly2.Components
 			NotRenderingSelfInvisible
 		}
 
+		private Bitmap bmp;
 		private Uplink<RenderBufferComponent> uplink;
 		private bool needsUpdate = false;
 		private RenderingStatus rendering = RenderingStatus.NotRenderingParentInvisible;
@@ -41,7 +44,7 @@ namespace Firefly2.Components
 		{
 			get { return Host.GetComponent<TransformComponent>(); }
 		}
-		private short transformIndex = -1;
+		private short objectIndex = -1;
 
 		private Renderer renderer;
 		public Renderer Renderer
@@ -55,17 +58,15 @@ namespace Firefly2.Components
 				{
 					renderer.RemoveRenderBuffer(this);
 					renderer.RemoveTransform(this);
+					renderer.RemoveTexture(this);
 				}
 
 				value.ProcessRenderBuffer(this);
 
-				var mat = Matrix4.Identity;
-				var transform = Host.GetComponent<TransformComponent>();
-				if (transform != null) mat = transform.ModelMatrix;
-				transformIndex = value.ProcessTransform(this, mat);
-
 				needsUpdate = true;
 				renderer = value;
+				ResetRenderer();
+
 				if (tree != null) tree.Send(new RendererChanged(value), TreeNodeComponent.SendRange.ImmediateChildrenOnly);
 			}
 		}
@@ -116,7 +117,8 @@ namespace Firefly2.Components
 
 		public void TakeMessage(AddedToEntity msg)
 		{
-			if (transform != null) transformIndex = transform.ObjectIndex;
+			//Make sure the index updates on the next update
+			objectIndex = -1;
 
 			needsUpdate = true;
 		}
@@ -142,15 +144,12 @@ namespace Firefly2.Components
 			if (!needsUpdate) return;
 			if (Geometry == null) return;
 
-			if (transformIndex == -1)
+			if (objectIndex == -1)
 			{
-				var transform = Host.GetComponent<TransformComponent>();
-				Matrix4 mat = Matrix4.Identity;
-				if (transform != null) mat = transform.ModelMatrix;
-				transformIndex = Renderer.ProcessTransform(this, mat);
+				ResetRenderer();
 			}
 
-			var poly = Geometry.Polygon.Select(vec => new VertexData(vec, transformIndex)).ToList();
+			var poly = Geometry.Polygon.Select(vec => new VertexData(vec, objectIndex)).ToList();
 			if (ShapeColor != null && ShapeColor.Colors.Count == Geometry.Polygon.Count)
 			{
 				for (int i = 0; i < ShapeColor.Colors.Count; ++i)
@@ -205,7 +204,8 @@ namespace Firefly2.Components
 			rendering = RenderingStatus.NotRenderingParentInvisible;
 			Renderer.RemoveRenderBuffer(this);
 			Renderer.RemoveTransform(this);
-			transformIndex = -1;
+			Renderer.RemoveTexture(this);
+			objectIndex = -1;
 			tree.Send(StopRendering.Instance, TreeNodeComponent.SendRange.ImmediateChildrenOnly);
 		}
 
@@ -213,9 +213,9 @@ namespace Firefly2.Components
 		{
 			if (Renderer == null) return;
 			var newIndex = Renderer.ProcessTransform(this, Host.GetComponent<TransformComponent>().ModelMatrix);
-			if (transformIndex != newIndex)
+			if (objectIndex != newIndex)
 			{
-				transformIndex = newIndex;
+				objectIndex = newIndex;
 				needsUpdate = true;
 			}
 		}
@@ -260,6 +260,27 @@ namespace Firefly2.Components
 					}
 				};
 			}
+		}
+
+		public void TakeMessage(TextureChanged msg)
+		{
+			bmp = msg.NewTexture;
+			if (Renderer == null) return;
+			var newIndex = Renderer.ProcessTexture(this, msg.NewTexture);
+			if (objectIndex != newIndex)
+			{
+				objectIndex = newIndex;
+				needsUpdate = true;
+			}
+		}
+
+		private void ResetRenderer()
+		{
+			var transform = Host.GetComponent<TransformComponent>();
+			Matrix4 mat = Matrix4.Identity;
+			if (transform != null) mat = transform.ModelMatrix;
+			objectIndex = Renderer.ProcessTransform(this, mat);
+			if (bmp != null) Renderer.ProcessTexture(this, bmp);
 		}
 	}
 }

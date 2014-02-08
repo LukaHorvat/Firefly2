@@ -73,17 +73,16 @@
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="Geometry\TriangulationVertex.cs" />
     <Compile Include="Geometry\VertexData.cs" />
-    <Compile Include="Graphics\Texture.cs" />
     <Compile Include="ITakesMessage.cs" />
     <Compile Include="IAnswersMessage.cs" />
     <Compile Include="Messages\AddedToEntity.cs" />
     <Compile Include="Messages\AfterUpdateMessage.cs" />
     <Compile Include="Messages\ComponentCollectionChanged.cs" />
     <Compile Include="Messages\GeometryChanged.cs" />
-    <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\NewChild.cs" />
     <Compile Include="Messages\NewParent.cs" />
     <Compile Include="Messages\RendererChanged.cs" />
+    <Compile Include="Messages\TextureChanged.cs" />
     <Compile Include="Messages\TransformationChanged.cs" />
     <Compile Include="Messages\ParentTransformChanged.cs" />
     <Compile Include="Messages\Querying\MouseIntersect.cs" />
@@ -105,6 +104,7 @@
     <Compile Include="Utility\MutableVector2.cs" />
     <Compile Include="Utility\PriorityQueue.cs" />
     <Compile Include="Algorithm\Triangulation.cs" />
+    <Compile Include="Utility\TexLib.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
