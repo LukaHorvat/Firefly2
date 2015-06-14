@@ -139,6 +139,15 @@ namespace Firefly2.Facilities
 			uniforms[index + offset] = (float)matrix[3, 0];
 			uniforms[index + offset + 1] = (float)matrix[3, 1];
 			uniforms[index + offset + 2] = (float)matrix[3, 2];
+
+			//Add -1 as texture coordinates so that objects without textures can be recognized
+			if (!atlasParcels.ContainsKey(GetOrAllocateIndex(renderBuffer)))
+			{
+				uniforms[index + offset + 3] = -1;
+				uniforms[index + offset + 4] = -1;
+				uniforms[index + offset + 5] = -1;
+				uniforms[index + offset + 6] = -1;
+			}
 			needsUpdate = true;
 
 			return transformMap[renderBuffer];
@@ -255,11 +264,16 @@ namespace Firefly2.Facilities
 			}
 		}
 
-		public void RemoveTransform(RenderBufferComponent renderBuffer)
+		public void RemoveTransformAndTexture(RenderBufferComponent renderBuffer)
 		{
 			if (transformMap.ContainsKey(renderBuffer))
 			{
-				freeIndices.Add(transformMap[renderBuffer]);
+				var index = transformMap[renderBuffer];
+				if (atlasParcels.ContainsKey(index))
+				{
+					atlasParcels.Remove(index);
+				}
+				freeIndices.Add(index);
 				transformMap.Remove(renderBuffer);
 			}
 		}

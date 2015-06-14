@@ -88,19 +88,14 @@ namespace Firefly2.Facilities
 			return GetLayer("default").ModifyOrAddTransform(renderBuffer, matrix);
 		}
 
-		public void RemoveTransform(RenderBufferComponent renderBuffer)
+		public void RemoveTransformAndTexture(RenderBufferComponent renderBuffer)
 		{
-			GetLayer("default").RemoveTransform(renderBuffer);
+			GetLayer("default").RemoveTransformAndTexture(renderBuffer);
 		}
 
 		public short ProcessTexture(RenderBufferComponent renderBuffer, Bitmap bmp)
 		{
 			return GetLayer("default").ModifyOrAddTexture(renderBuffer, bmp);
-		}
-
-		public void RemoveTexture(RenderBufferComponent renderBuffer)
-		{
-			throw new NotImplementedException();
 		}
 
 		public void Render()

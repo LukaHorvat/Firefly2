@@ -57,8 +57,7 @@ namespace Firefly2.Components
 				if (renderer != null)
 				{
 					renderer.RemoveRenderBuffer(this);
-					renderer.RemoveTransform(this);
-					renderer.RemoveTexture(this);
+					renderer.RemoveTransformAndTexture(this);
 				}
 
 				value.ProcessRenderBuffer(this);
@@ -203,8 +202,7 @@ namespace Firefly2.Components
 		{
 			rendering = RenderingStatus.NotRenderingParentInvisible;
 			Renderer.RemoveRenderBuffer(this);
-			Renderer.RemoveTransform(this);
-			Renderer.RemoveTexture(this);
+			Renderer.RemoveTransformAndTexture(this);
 			objectIndex = -1;
 			tree.Send(StopRendering.Instance, TreeNodeComponent.SendRange.ImmediateChildrenOnly);
 		}

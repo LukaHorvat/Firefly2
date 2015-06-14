@@ -55,6 +55,10 @@ void main()
 		object_texture.x + (object_texture.z - object_texture.x) * vertex_texcoords.x,
 		object_texture.y + (object_texture.w - object_texture.y) * vertex_texcoords.y
 	);
+	if (get(i + 7) < 0.0)
+	{
+		actual_texcoords = vec2(-1.0, -1.0);
+	}
 
 	fragment_color = vertex_color;
 	fragment_texcoords = actual_texcoords;
@@ -73,7 +77,16 @@ out vec4 final_color;
 
 void main()
 {
-	final_color = texture(atlas, fragment_texcoords) + fragment_color;
+	vec4 tex_color;
+	if (fragment_texcoords.x < 0.0) 
+	{
+		tex_color = vec4(0.0, 0.0, 0.0, 0.0);
+	}
+	else
+	{
+		tex_color = texture(atlas, fragment_texcoords);
+	}
+	final_color = tex_color + fragment_color;
 	//final_color = vec4(fragment_texcoords, 1.0, 1.0);
 	//final_color = fragment_color;
 }
